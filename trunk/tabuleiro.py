@@ -44,11 +44,12 @@ class Tabuleiro:
             return
         if y < self.offset[1] or y > self.size[1] + self.offset[1]:
             return
+	
         peca = self.tabuleiro[self.map(x, 0)][self.map(y, 1)]
-        if peca.estado != 0:
-            peca.estado = 0
-        else:
+        if peca.estado == 0:
             peca.estado = self.alternador()
+        else:
+            peca.estado = peca.estado
 
         
     def map(self, x, i):
