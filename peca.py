@@ -15,7 +15,7 @@ class Peca:
             return self.imgSurface[self.estado-1]
         else:
             return ""
-        
+
     def __str__(self):
         return "Peca com estado " + str(self.estado)
     
