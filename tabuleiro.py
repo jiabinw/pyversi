@@ -13,6 +13,7 @@ class Tabuleiro:
     last = 2
     
     def __init__(self, game):
+        self.font = pygame.font.SysFont("Courier New", 18)
         self.pygame = game       
         self.ImgSurface = self.pygame.image.load(self.IMGPATH)
         row = [0]*8
@@ -25,6 +26,10 @@ class Tabuleiro:
     def refresh(self):
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
+        
+        #escreve a pontuacao na tela        
+        ren = self.font.render("teste",1,(255,255,255))
+        screen.blit(ren,(120,0))
         
         for i in range(8):
             for j in range(8):
