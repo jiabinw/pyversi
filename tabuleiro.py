@@ -2,7 +2,6 @@
 import os, sys, copy
 from peca import *
 import time
-from checkbox.message import Message
 
 class Tabuleiro:
     pygame = 0
@@ -76,7 +75,7 @@ class Tabuleiro:
                     fim=0
                     break
         if fim == 1:
-            print("fim")            
+            print "Fim do Jogo"            
             return 1
         
     def initPecas(self):
@@ -165,7 +164,7 @@ class Tabuleiro:
 		virar.append(peca)
 
 	# PERCORRENDO DIAGONAIS
-	if j > i: # A diogonal será percorrida até no maximo a distancia mais proxima a borda (horizontal ou vertical)
+	if j > i: # A diogonal sera percorrida ate no maximo a distancia mais proxima a borda (horizontal ou vertical)
 		indD = 8 - j - 1
 	else:
 		indD = 8 - i - 1
@@ -238,7 +237,6 @@ class Tabuleiro:
 
     def verificaJogada(self, peca, a): # 1:jogadaValida, 0:continua, 2:para
 	if peca.estado == 0:
-		print " PARAR "
 		return 2
 
 	# Se a peca que esta percorrendo e a mesma do jogador atual e ha pelo menos uma peca entre as duas
