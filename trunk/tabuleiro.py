@@ -2,6 +2,7 @@
 import os, sys, copy
 from peca import *
 import time
+from checkbox.message import Message
 
 class Tabuleiro:
     pygame = 0
@@ -30,34 +31,34 @@ class Tabuleiro:
         screen.blit(self.ImgSurface, self.offset)
         
         #escreve a pontuacao na tela
-	peca = Peca()
-	ren = self.font.render(" Pontuacao",1,(0,0,0))
-	screen.blit(ren,(120,0))
+        peca = Peca()
+        ren = self.font.render(" Pontuacao",1,(0,0,0))
+        screen.blit(ren,(120,0))
 
-	#peca vermelha
-	peca.estado = 1	
-	pontVerm = self.font.render(":" + str(self.pontosVermelho),1,(255,0,0))
-	screen.blit(pontVerm,(155,30))
-	screen.blit(peca.img(), (120, 20))
+        #peca vermelha
+        peca.estado = 1	
+        pontVerm = self.font.render(":" + str(self.pontosVermelho),1,(255,0,0))
+        screen.blit(pontVerm,(155,30))
+        screen.blit(peca.img(), (120, 20))
 
-	#peca preta
-	peca.estado = 2
-	pontPreto = self.font.render(":" + str(self.pontosPreto),1,(0,0,0))
-	screen.blit(pontPreto,(220, 30))
-	screen.blit(peca.img(), (185, 20))
+        #peca preta
+        peca.estado = 2
+        pontPreto = self.font.render(":" + str(self.pontosPreto),1,(0,0,0))
+        screen.blit(pontPreto,(220, 30))
+        screen.blit(peca.img(), (185, 20))
 
-	#cronometro
-	cron = self.font.render(" Tempo",1,(0,0,0))
-	screen.blit(cron,(250,0))
-	clock = pygame.time.Clock()
-	segundos = int(round(pygame.time.get_ticks()/1000))
-	minutos = int(round(segundos/60))
-	segundos = int(round(segundos % 60))
+        #cronometro
+        cron = self.font.render(" Tempo",1,(0,0,0))
+        screen.blit(cron,(250,0))
+        clock = pygame.time.Clock()
+        segundos = int(round(pygame.time.get_ticks()/1000))
+        minutos = int(round(segundos/60))
+        segundos = int(round(segundos % 60))
+        
+        cronometro = ('%02d:%02d' % (minutos, segundos))
+        tempo = self.font.render(str(cronometro), 1, (0,0,0))
+        screen.blit(tempo, (260, 30))
 
-	cronometro = ('%02d:%02d' % (minutos, segundos))
-	tempo = self.font.render(str(cronometro), 1, (0,0,0))
-	screen.blit(tempo, (260, 30))
-	
 
         for i in range(8):
             for j in range(8):
@@ -67,17 +68,16 @@ class Tabuleiro:
                     screen.blit(newsurface, (i*41 + 5 + self.offset[0], j*41 + 5 + self.offset[1]))
  
     def fimJogo(self):
-        fim=0
+        fim=1        
         for i in range(8):
             for j in range(8):
                 item = self.tabuleiro[i][j]
                 if item.estado == 0:
-                    fim=1
+                    fim=0
                     break
-        if fim == 0:
-            print("fim")
-                
-        
+        if fim == 1:
+            print("fim")            
+            return 1
         
     def initPecas(self):
         for i in range(8):
