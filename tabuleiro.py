@@ -66,6 +66,18 @@ class Tabuleiro:
                     newsurface = item.img()
                     screen.blit(newsurface, (i*41 + 5 + self.offset[0], j*41 + 5 + self.offset[1]))
  
+    def fimJogo(self):
+        fim=0
+        for i in range(8):
+            for j in range(8):
+                item = self.tabuleiro[i][j]
+                if item.estado == 0:
+                    fim=1
+                    break
+        if fim == 0:
+            print("fim")
+                
+        
         
     def initPecas(self):
         for i in range(8):
@@ -77,24 +89,26 @@ class Tabuleiro:
             return
         if y < self.offset[1] or y > self.size[1] + self.offset[1]:
             return
-	
+
         peca = self.tabuleiro[self.map(x, 0)][self.map(y, 1)]
         if peca.estado == 0:
             peca.estado = self.alternador()
         else:
             peca.estado = peca.estado
-	self.pontuacao()
+        self.fimJogo()
+        self.pontuacao()
+        
 
     def pontuacao(self):
-	self.pontosVermelho = 0
-	self.pontosPreto = 0
-	for i in range(8):
-	    for j in range(8):
-		peca = self.tabuleiro[i][j]
-		if peca.estado == 1:
-		    self.pontosVermelho = self.pontosVermelho + 1
-		elif peca.estado == 2:
-		    self.pontosPreto = self.pontosPreto + 1
+        self.pontosVermelho = 0
+        self.pontosPreto = 0
+        for i in range(8):
+            for j in range(8):
+                peca = self.tabuleiro[i][j]
+                if peca.estado == 1:
+                    self.pontosVermelho = self.pontosVermelho + 1
+                elif peca.estado == 2:
+                    self.pontosPreto = self.pontosPreto + 1
 
         
     def map(self, x, i):
