@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os, sys, copy
 from peca import *
-import time
 
 class Tabuleiro:
     pygame = 0
@@ -13,6 +12,7 @@ class Tabuleiro:
     pontosVermelho = 0
     pontosPreto = 0
     last = 2
+    tempo = 0
     
     def __init__(self, game):
         self.font = pygame.font.SysFont("Courier New", 18)
@@ -26,18 +26,28 @@ class Tabuleiro:
         self.initPecas()
         
     def refresh(self):
+   	self.tempo = self.tempo + 1.5
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
+
+	#proximo jogador
+	peca = Peca()
+	proximo = self.font.render(" Proximo",1,(0,0,0))
+        screen.blit(proximo,(25,30))
+	if self.last == 2:
+		peca.estado = 1
+	elif self.last == 1:
+		peca.estado = 2	
+	screen.blit(peca.img(), (0, 25))
         
         #escreve a pontuacao na tela
-        peca = Peca()
         ren = self.font.render(" Pontuacao",1,(0,0,0))
         screen.blit(ren,(120,0))
 
         #peca vermelha
         peca.estado = 1	
         pontVerm = self.font.render(":" + str(self.pontosVermelho),1,(255,0,0))
-        screen.blit(pontVerm,(155,30))
+        screen.blit(pontVerm,(150,30))
         screen.blit(peca.img(), (120, 20))
 
         #peca preta
@@ -49,14 +59,13 @@ class Tabuleiro:
         #cronometro
         cron = self.font.render(" Tempo",1,(0,0,0))
         screen.blit(cron,(250,0))
-        clock = pygame.time.Clock()
-        segundos = int(round(pygame.time.get_ticks()/1000))
+	segundos = int(round(self.tempo/1000))
         minutos = int(round(segundos/60))
         segundos = int(round(segundos % 60))
         
         cronometro = ('%02d:%02d' % (minutos, segundos))
-        tempo = self.font.render(str(cronometro), 1, (0,0,0))
-        screen.blit(tempo, (260, 30))
+        tempoTela = self.font.render(str(cronometro), 1, (0,0,0))
+        screen.blit(tempoTela, (260, 30))
 
 
         for i in range(8):
@@ -65,6 +74,8 @@ class Tabuleiro:
                 if item.estado != 0:
                     newsurface = item.img()
                     screen.blit(newsurface, (i*41 + 5 + self.offset[0], j*41 + 5 + self.offset[1]))
+
+   	self.tempo = self.tempo + 1.5
  
     def fimJogo(self):
         fim=1        
@@ -164,7 +175,7 @@ class Tabuleiro:
 		virar.append(peca)
 
 	# PERCORRENDO DIAGONAIS
-	if j > i: # A diogonal sera percorrida ate no maximo a distancia mais proxima a borda (horizontal ou vertical)
+	if j > i: # A diagonal sera percorrida ate no maximo a distancia mais proxima a borda (horizontal ou vertical)
 		indD = 8 - j - 1
 	else:
 		indD = 8 - i - 1
@@ -268,4 +279,5 @@ class Tabuleiro:
             self.last = 2
         else:
             self.last = 1
+	self.tempo = 0
         return self.last
