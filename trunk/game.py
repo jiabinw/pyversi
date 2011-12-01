@@ -79,7 +79,7 @@ class Game:
 		form.td(e)
 	  
 		c = gui.Container(align=-1,valign=-1)
-		c.add(form,0,20)
+		c.add(form,0,0)
 	
 		self.app.init(c)
 		self.tab = Tabuleiro(pygame) 
