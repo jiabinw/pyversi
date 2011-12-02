@@ -78,18 +78,50 @@ class Tabuleiro:
    	self.tempo = self.tempo + 1.5
  
     def fimJogo(self, tabuleiroFimJogo):
-        fim = 1        
+        fim = 1		# 1 = fim de jogo; 0 = continua jogo
+	passaVez = 1	# 1 = precisa passar a vez; 0 = jogador atual ainda tem jogada possivel	
+	todosVermelho = 1
+	todosPreto = 1
 
 	# Caso base, todas as posicoes do tabuleiro ocupadas
         for i in range(8):
             for j in range(8):
-                item = tabuleiroFimJogo[i][j]
+		item = tabuleiroFimJogo[i][j]
                 if item.estado == 0:
                     fim = 0
-                    break
+		elif item.estado == 1:
+		    todosPreto = 0
+		elif item.estado == 2:
+		    todosVermelho = 0
 	
-	# Verificacao de Passar a vez
-
+	if (todosPreto):
+		print " Preto ganhou "
+		fim = 1
+	if (todosVermelho):
+		print " Vermelho ganhou "
+		fim = 1
+	
+	# Verificacao de passar a vez
+	for i in range(8):
+		for j in range(8):
+			item = tabuleiroFimJogo[i][j]
+			if ((item.estado == 0) and (self.jogadaValida(j, i, tabuleiroFimJogo, 1))):	#jogador atual #ainda tem jogada valida
+				j = i = 9
+				fim = passaVez = 0
+				break
+	
+	# Se for pra passar a vez, verifico se o outro jogador tem possibilidade de jogada, caso nao tenha, o jogo acabou
+	print "passaVez = " + str(passaVez)
+	if (passaVez):	
+		self.alternador()
+		for i in range(8):
+			for j in range(8):
+				item = tabuleiroFimJogo[i][j]
+				if ((item.estado == 0) and (self.jogadaValida(j, i, tabuleiroFimJogo, 1))):	#jogador #atual ainda tem jogada
+					j = i = 9
+					fim = 0
+					break
+	
 	
         if fim == 1:
             print "Fim do Jogo"            
@@ -116,7 +148,7 @@ class Tabuleiro:
 
         peca = self.tabuleiro[self.map(x, 0)][self.map(y, 1)]
 
-        if peca.estado == 0 and self.jogadaValida(self.map(x, 0), self.map(y, 1)) == 1:
+        if peca.estado == 0 and self.jogadaValida(self.map(x, 0), self.map(y, 1), self.tabuleiro, 0) == 1:
             peca.estado = self.alternador()
         else:
             peca.estado = peca.estado
@@ -124,67 +156,72 @@ class Tabuleiro:
         self.pontuacao()
         
 
-    def jogadaValida(self, i, j): #0:jogadaInvalida, 1:jogadaValida	
+    def jogadaValida(self, i, j, tabuleiroFimJogo, verifica): #0:jogadaInvalida, 1:jogadaValida	
 	todosVirar = []
 	virar = []
 	jogadaValida = 0
 	# PERCORRENDO COLUNAS
 	for a in range(8 - i - 1): # Para direita
 		col = i + a + 1
-		peca = self.tabuleiro[col][j]
+		peca = tabuleiroFimJogo[col][j]
 		resposta = self.verificaJogada(peca, a)
 		if resposta == 1:
-			todosVirar.append(virar)
+			if (not(verifica)):
+				todosVirar.append(virar)
 			jogadaValida = 1
 			break
 		if resposta == 2:
 			break
-		virar.append(peca)
+		if (not(verifica)):
+			virar.append(peca)
 
 	virar = []
 	for a in range(i): # Para esquerda
 		col = i - (a + 1)
-		peca = self.tabuleiro[col][j]
+		peca = tabuleiroFimJogo[col][j]
 		resposta = self.verificaJogada(peca, a)
 		if resposta == 1:
-			todosVirar.append(virar)
+			if (not(verifica)):
+				todosVirar.append(virar)
 			jogadaValida = 1
 			break
 		if resposta == 2:
 			break
-		virar.append(peca)
+		if (not(verifica)):
+			virar.append(peca)
 	
 	virar = []
 	# PERCORRENDO LINHAS
 	for a in range(8 - j - 1): # Para baixo
 		lin = j + a + 1
-		peca = self.tabuleiro[i][lin]
+		peca = tabuleiroFimJogo[i][lin]
 		resposta = self.verificaJogada(peca, a)
 		if resposta == 1:
-			todosVirar.append(virar)
+			if (not(verifica)):
+				todosVirar.append(virar)
 			jogadaValida = 1
 			break
 		if resposta == 2:
 			break
-		virar.append(peca)
+		if (not(verifica)):
+			virar.append(peca)
 	virar = []
 	for a in range(j): # Para cima
 		lin = j - (a + 1)
-		peca = self.tabuleiro[i][lin]
+		peca = tabuleiroFimJogo[i][lin]
 		resposta = self.verificaJogada(peca, a)
 		if resposta == 1:
-			todosVirar.append(virar)
+			if (not(verifica)):
+				todosVirar.append(virar)
 			jogadaValida = 1
 			break
 		if resposta == 2:
 			break
-		virar.append(peca)
+		if (not(verifica)):
+			virar.append(peca)
 
 	# PERCORRENDO DIAGONAIS
-	if j > i: # A diagonal sera percorrida ate no maximo a distancia mais proxima a borda (horizontal ou vertical)
-		indD = 7
-	else:
-		indD = 7
+	indD = 7
 	virar = []
 	if (j < 7 and i < 7):
 		for a in range(indD): # Para baixo, direita
@@ -192,33 +229,36 @@ class Tabuleiro:
 			col = i + a + 1
 			if(lin > 7 or col > 7 or lin < 0 or col < 0):
 				break
-			peca = self.tabuleiro[col][lin]
+			peca = tabuleiroFimJogo[col][lin]
 			resposta = self.verificaJogada(peca, a)
 			if resposta == 1:
-				todosVirar.append(virar)
+				if (not(verifica)):
+					todosVirar.append(virar)
 				jogadaValida = 1
 				break
 			if resposta == 2:
 				break
-			virar.append(peca)
+			if (not(verifica)):
+				virar.append(peca)
 
 		virar = []
 	if (i < 7):
 		for a in range(indD): # Para cima, direita
 			lin = j - (a + 1)
-			print lin
 			col = i + a + 1
 			if(lin > 7 or col > 7 or lin < 0 or col < 0):
 				break
-			peca = self.tabuleiro[col][lin]
+			peca = tabuleiroFimJogo[col][lin]
 			resposta = self.verificaJogada(peca, a)
 			if resposta == 1:
-				todosVirar.append(virar)
+				if (not(verifica)):
+					todosVirar.append(virar)
 				jogadaValida = 1
 				break
 			if resposta == 2:
 				break
-			virar.append(peca)
+			if (not(verifica)):
+				virar.append(peca)
 		virar = []
 	if (j < 7):
 		for a in range(indD): # Para baixo, esquerda
@@ -226,33 +266,37 @@ class Tabuleiro:
 			col = i - (a + 1)
 			if(lin > 7 or col > 7 or lin < 0 or col < 0):
 				break
-			peca = self.tabuleiro[col][lin]
+			peca = tabuleiroFimJogo[col][lin]
 			resposta = self.verificaJogada(peca, a)
 			if resposta == 1:
-				todosVirar.append(virar)
+				if (not(verifica)):
+					todosVirar.append(virar)
 				jogadaValida = 1
 				break
 			if resposta == 2:
 				break
-			virar.append(peca)
+			if (not(verifica)):
+				virar.append(peca)
 		virar = []
 	for a in range(indD): # Para cima, esquerda
 		lin = j - (a + 1)
 		col = i - (a + 1)
 		if(lin > 7 or col > 7 or lin < 0 or col < 0):
 			break
-		peca = self.tabuleiro[col][lin]
+		peca = tabuleiroFimJogo[col][lin]
 		resposta = self.verificaJogada(peca, a)
 		if resposta == 1:
-			todosVirar.append(virar)
+			if (not(verifica)):
+				todosVirar.append(virar)
 			jogadaValida = 1
 			break
 		if resposta == 2:
 			break
-		virar.append(peca)
+		if (not(verifica)):
+			virar.append(peca)
 
 	# Se a jogada for valida, da o flip nas pecas para a cor do jogador corrente
-	if jogadaValida == 1:
+	if ((jogadaValida == 1) and (not(verifica))):
 		if self.last == 1:
 			cor = 2
 		else:
@@ -260,7 +304,7 @@ class Tabuleiro:
 		for t in todosVirar:
 			for t0 in t:
 				t0.estado = cor
-	else:
+	elif((jogadaValida != 1) and (not(verifica))):
 		print "Erro: Jogada Invalida"		
 		
 	return jogadaValida
