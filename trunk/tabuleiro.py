@@ -176,52 +176,64 @@ class Tabuleiro:
 
 	# PERCORRENDO DIAGONAIS
 	if j > i: # A diagonal sera percorrida ate no maximo a distancia mais proxima a borda (horizontal ou vertical)
-		indD = 8 - j - 1
+		indD = 7
 	else:
-		indD = 8 - i - 1
+		indD = 7
 	virar = []
-	for a in range(indD): # Para baixo, direita
-		lin = j + a + 1
-		col = i + a + 1
-		peca = self.tabuleiro[col][lin]
-		resposta = self.verificaJogada(peca, a)
-		if resposta == 1:
-			todosVirar.append(virar)
-			jogadaValida = 1
-			break
-		if resposta == 2:
-			break
-		virar.append(peca)
-	virar = []
-	for a in range(indD): # Para cima, direita
-		lin = j - (a + 1)
-		col = i + a + 1
-		peca = self.tabuleiro[col][lin]
-		resposta = self.verificaJogada(peca, a)
-		if resposta == 1:
-			todosVirar.append(virar)
-			jogadaValida = 1
-			break
-		if resposta == 2:
-			break
-		virar.append(peca)
-	virar = []
-	for a in range(indD): # Para baixo, esquerda
-		lin = j + a + 1
-		col = i - (a + 1)
-		peca = self.tabuleiro[col][lin]
-		resposta = self.verificaJogada(peca, a)
-		if resposta == 1:
-			todosVirar.append(virar)
-			jogadaValida = 1
-			break
-		if resposta == 2:
-			break
-		virar.append(peca)
-	virar = []
+	if (j < 7 and i < 7):
+		for a in range(indD): # Para baixo, direita
+			lin = j + a + 1
+			col = i + a + 1
+			if(lin > 7 or col > 7):
+				break
+			peca = self.tabuleiro[col][lin]
+			resposta = self.verificaJogada(peca, a)
+			if resposta == 1:
+				todosVirar.append(virar)
+				jogadaValida = 1
+				break
+			if resposta == 2:
+				break
+			virar.append(peca)
+
+		virar = []
+	if (i < 7):
+		for a in range(indD): # Para cima, direita
+			lin = j - (a + 1)
+			col = i + a + 1
+			if(lin > 7 or col > 7):
+				break
+			peca = self.tabuleiro[col][lin]
+			resposta = self.verificaJogada(peca, a)
+			if resposta == 1:
+				todosVirar.append(virar)
+				jogadaValida = 1
+				break
+			if resposta == 2:
+				break
+			virar.append(peca)
+		virar = []
+	if (j < 7):
+		for a in range(indD): # Para baixo, esquerda
+			lin = j + a + 1
+			col = i - (a + 1)
+			if(lin > 7 or col > 7):
+				break
+			peca = self.tabuleiro[col][lin]
+			resposta = self.verificaJogada(peca, a)
+			if resposta == 1:
+				todosVirar.append(virar)
+				jogadaValida = 1
+				break
+			if resposta == 2:
+				break
+			virar.append(peca)
+		virar = []
 	for a in range(indD): # Para cima, esquerda
 		lin = j - (a + 1)
 		col = i - (a + 1)
+		if(lin > 7 or col > 7):
+			break
 		peca = self.tabuleiro[col][lin]
 		resposta = self.verificaJogada(peca, a)
 		if resposta == 1:
