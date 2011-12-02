@@ -77,14 +77,20 @@ class Tabuleiro:
 
    	self.tempo = self.tempo + 1.5
  
-    def fimJogo(self):
-        fim=1        
+    def fimJogo(self, tabuleiroFimJogo):
+        fim = 1        
+
+	# Caso base, todas as posicoes do tabuleiro ocupadas
         for i in range(8):
             for j in range(8):
-                item = self.tabuleiro[i][j]
+                item = tabuleiroFimJogo[i][j]
                 if item.estado == 0:
-                    fim=0
+                    fim = 0
                     break
+	
+	# Verificacao de Passar a vez
+
+	
         if fim == 1:
             print "Fim do Jogo"            
             return 1
@@ -114,7 +120,7 @@ class Tabuleiro:
             peca.estado = self.alternador()
         else:
             peca.estado = peca.estado
-        self.fimJogo()
+        self.fimJogo(self.tabuleiro)
         self.pontuacao()
         
 
@@ -184,7 +190,7 @@ class Tabuleiro:
 		for a in range(indD): # Para baixo, direita
 			lin = j + a + 1
 			col = i + a + 1
-			if(lin > 7 or col > 7):
+			if(lin > 7 or col > 7 or lin < 0 or col < 0):
 				break
 			peca = self.tabuleiro[col][lin]
 			resposta = self.verificaJogada(peca, a)
@@ -200,8 +206,9 @@ class Tabuleiro:
 	if (i < 7):
 		for a in range(indD): # Para cima, direita
 			lin = j - (a + 1)
+			print lin
 			col = i + a + 1
-			if(lin > 7 or col > 7):
+			if(lin > 7 or col > 7 or lin < 0 or col < 0):
 				break
 			peca = self.tabuleiro[col][lin]
 			resposta = self.verificaJogada(peca, a)
@@ -217,7 +224,7 @@ class Tabuleiro:
 		for a in range(indD): # Para baixo, esquerda
 			lin = j + a + 1
 			col = i - (a + 1)
-			if(lin > 7 or col > 7):
+			if(lin > 7 or col > 7 or lin < 0 or col < 0):
 				break
 			peca = self.tabuleiro[col][lin]
 			resposta = self.verificaJogada(peca, a)
@@ -232,7 +239,7 @@ class Tabuleiro:
 	for a in range(indD): # Para cima, esquerda
 		lin = j - (a + 1)
 		col = i - (a + 1)
-		if(lin > 7 or col > 7):
+		if(lin > 7 or col > 7 or lin < 0 or col < 0):
 			break
 		peca = self.tabuleiro[col][lin]
 		resposta = self.verificaJogada(peca, a)
