@@ -13,6 +13,9 @@ class Tabuleiro:
     pontosPreto = 0
     last = 2
     tempo = 0
+    tempoVermelho = 0
+    tempoPreto = 0
+    tempoAdicionar = 1.9
     
     def __init__(self, game):
         self.font = pygame.font.SysFont("Courier New", 18)
@@ -26,7 +29,6 @@ class Tabuleiro:
         self.initPecas()
         
     def refresh(self):
-   	self.tempo = self.tempo + 1.5
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
 
@@ -35,8 +37,10 @@ class Tabuleiro:
 	proximo = self.font.render(" Proximo",1,(0,0,0))
         screen.blit(proximo,(25,30))
 	if self.last == 2:
+	   	self.tempoVermelho = self.tempoVermelho + self.tempoAdicionar
 		peca.estado = 1
 	elif self.last == 1:
+		self.tempoPreto = self.tempoPreto + self.tempoAdicionar
 		peca.estado = 2	
 	screen.blit(peca.img(), (0, 25))
         
@@ -352,7 +356,8 @@ class Tabuleiro:
     def alternador(self):
         if self.last == 1:
             self.last = 2
+	    self.tempo = self.tempoVermelho
         else:
             self.last = 1
-	self.tempo = 0
+	    self.tempo = self.tempoPreto
         return self.last
