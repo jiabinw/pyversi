@@ -80,10 +80,10 @@ class Tabuleiro:
     def fimJogo(self, tabuleiroFimJogo):
         fim = 1		# 1 = fim de jogo; 0 = continua jogo
 	passaVez = 1	# 1 = precisa passar a vez; 0 = jogador atual ainda tem jogada possivel	
-	todosVermelho = 1
-	todosPreto = 1
+	todosVermelho = 1	# 1 = nao existe peca preta, vermelho ganhou
+	todosPreto = 1		# 1 = nao existe peca vermelha, preto ganhou
 
-	# Caso base, todas as posicoes do tabuleiro ocupadas
+	# Caso base, todas as posicoes do tabuleiro ocupadas, ou so pecas de um jogador
         for i in range(8):
             for j in range(8):
 		item = tabuleiroFimJogo[i][j]
@@ -94,38 +94,50 @@ class Tabuleiro:
 		elif item.estado == 2:
 		    todosVermelho = 0
 	
-	if (todosPreto):
-		print " Preto ganhou "
+	if (todosPreto or todosVermelho):
 		fim = 1
-	if (todosVermelho):
-		print " Vermelho ganhou "
+
+	if (not(fim)):
 		fim = 1
-	
-	# Verificacao de passar a vez
-	for i in range(8):
-		for j in range(8):
-			item = tabuleiroFimJogo[i][j]
-			if ((item.estado == 0) and (self.jogadaValida(j, i, tabuleiroFimJogo, 1))):	#jogador atual #ainda tem jogada valida
-				j = i = 9
-				fim = passaVez = 0
-				break
-	
-	# Se for pra passar a vez, verifico se o outro jogador tem possibilidade de jogada, caso nao tenha, o jogo acabou
-	print "passaVez = " + str(passaVez)
-	if (passaVez):	
-		self.alternador()
+		# Verificacao de passar a vez
 		for i in range(8):
+			if (passaVez == 0):
+				break
 			for j in range(8):
 				item = tabuleiroFimJogo[i][j]
-				if ((item.estado == 0) and (self.jogadaValida(j, i, tabuleiroFimJogo, 1))):	#jogador #atual ainda tem jogada
-					j = i = 9
-					fim = 0
+				if (item.estado == 0):
+					#jogador atual ainda tem jogada valida
+					if(self.jogadaValida(i, j, tabuleiroFimJogo, 1)):	
+						fim = passaVez = 0
+						break
+			
+	
+		# Se for pra passar a vez, verifico se o outro jogador tem possibilidade de jogada, caso nao tenha, o jogo 			acabou
+		if (passaVez):	
+			print " Passou a vez "
+			self.alternador()
+			for i in range(8):
+				if (passaVez == 0):
 					break
+				for j in range(8):
+					item = tabuleiroFimJogo[i][j]
+					if (item.estado == 0): 
+						if (self.jogadaValida(i, j, tabuleiroFimJogo, 1)):						#jogador atual ainda tem jogada
+							fim = 0
+							break
 	
 	
-        if fim == 1:
-            print "Fim do Jogo"            
-            return 1
+        if (fim):
+            print " Fim do Jogo "            
+	    self.pontuacao()
+	    if self.pontosVermelho > self.pontosPreto:
+		print " Vermelho ganhou "
+	    elif self.pontosVermelho < self.pontosPreto:
+		print " Preto ganhou "
+	    else:
+		print " Empate "
+
+	return fim
         
     def initPecas(self):
         for i in range(8):
