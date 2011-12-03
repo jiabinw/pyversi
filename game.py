@@ -23,7 +23,7 @@ class Game:
                 if event.type == QUIT: 
                     sys.exit(0)
                 elif event.type == MOUSEBUTTONDOWN:
-                    self.tab.click(event.dict['pos'][0],event.dict['pos'][1])
+                    self.botaoHabilitado = self.tab.click(event.dict['pos'][0],event.dict['pos'][1])
                     self.app.event(event)
                 else:
                     self.app.event(event)
@@ -39,6 +39,10 @@ class Game:
     def novoJogoEventHandler(self, event):
 	self.estadoJogo = 0
 	self.inicializado = 0
+    
+    def passarVezEventHandler(self, event):
+	self.tab.alternador()
+
 	
     def __init__(self):
         pygame.init()
@@ -74,9 +78,13 @@ class Game:
 		self.app = gui.App()
 		form = gui.Table()
 		form.tr()
-		e = gui.Button("Novo Jogo")
+		e = gui.Button("Novo")
 		e.connect(gui.CLICK, self.novoJogoEventHandler, None)
 		form.td(e)
+		
+		f = gui.Button("Passar")
+		f.connect(gui.CLICK, self.passarVezEventHandler, None)
+		form.td(f)
 	  
 		c = gui.Container(align=-1,valign=-1)
 		c.add(form,0,0)

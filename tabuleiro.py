@@ -29,12 +29,13 @@ class Tabuleiro:
         self.initPecas()
         
     def refresh(self):
-        screen = self.pygame.display.get_surface()        
+        
+	screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
 
 	#proximo jogador
 	peca = Peca()
-	proximo = self.font.render(" Proximo",1,(0,0,0))
+	proximo = self.font.render(" Proximo ",1,(0,0,0))
         screen.blit(proximo,(25,30))
 	if self.last == 2:
 	   	self.tempoVermelho = self.tempoVermelho + self.tempoAdicionar
@@ -57,7 +58,7 @@ class Tabuleiro:
         #peca preta
         peca.estado = 2
         pontPreto = self.font.render(":" + str(self.pontosPreto),1,(0,0,0))
-        screen.blit(pontPreto,(220, 30))
+        screen.blit(pontPreto,(215, 30))
         screen.blit(peca.img(), (185, 20))
 
         #cronometro
@@ -79,7 +80,7 @@ class Tabuleiro:
                     newsurface = item.img()
                     screen.blit(newsurface, (i*41 + 5 + self.offset[0], j*41 + 5 + self.offset[1]))
 
-   	self.tempo = self.tempo + 1.5
+   	self.tempo = self.tempo + self.tempoAdicionar
  
     def fimJogo(self, tabuleiroFimJogo):
         fim = 1		# 1 = fim de jogo; 0 = continua jogo
@@ -168,7 +169,8 @@ class Tabuleiro:
             peca.estado = self.alternador()
         else:
             peca.estado = peca.estado
-        self.fimJogo(self.tabuleiro)
+	
+	self.fimJogo(self.tabuleiro)
         self.pontuacao()
         
 
