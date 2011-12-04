@@ -2,6 +2,9 @@
 import os, sys, copy
 from peca import *
 from numeroPeca import *
+from mobilidade import *
+from pesoPosicao import *
+from captura import *
 
 class Tabuleiro:
     pygame = 0
@@ -13,6 +16,7 @@ class Tabuleiro:
     pontosVermelho = 0
     pontosPreto = 0
     last = 2
+    atual = 1
     tempo = 0
     tempoVermelho = 0
     tempoPreto = 0
@@ -33,24 +37,37 @@ class Tabuleiro:
             
         self.initPecas()
         
+        print ai1, ai2
+        self.heuristicas = []
+        
         if ai1 != -1:
             self.ai = 1
             if ai1 == 0:
                 self.heuristicas.append(NumeroPeca())
-            
+            elif ai1 == 1:
+                self.heuristicas.append(Mobilidade())
+            elif ai1 == 2:
+                self.heuristicas.append(Captura())
+            elif ai1 == 3:
+                self.heuristicas.append(PesoPosicao())
         if ai1 != -1 and ai2 != -1:
             self.ai = 1
             if ai2 ==0:
                 self.heuristicas.append(NumeroPeca())
+            elif ai2 == 1:
+                self.heuristicas.append(Mobilidade())
+            elif ai2 == 2:
+                self.heuristicas.append(Captura())
+            elif ai2 == 3:
+                self.heuristicas.append(PesoPosicao())
         else:
             self.human = 1
             
         
-        
     def refresh(self):
         
         if not self.human and not self.fim:
-            self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[self.atual - 1])[1]
+            self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[self.atual - 1])[1]
             self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
@@ -73,7 +90,7 @@ class Tabuleiro:
         #escreve a pontuacao na tela
         ren = self.font.render(" Pontuacao",1,(0,0,0))
         screen.blit(ren,(120,0))
-        
+
         #peca vermelha
         peca.estado = 1 
         pontVerm = self.font.render(":" + str(self.pontosVermelho),1,(255,0,0))
@@ -107,17 +124,17 @@ class Tabuleiro:
 
         self.tempo = self.tempo + self.tempoAdicionar
         
-    def isPassaVez(self, tabuleiroFimJogo):
+    def isPassaVez(self, tabuleiroFimJogo, jogadorAtual):
         for i in range(8):
             for j in range(8):
                 item = tabuleiroFimJogo[i][j]
                 if (item.estado == 0):
                     #jogador atual ainda tem jogada valida
-                    if(self.jogadaValida(i, j, tabuleiroFimJogo, 1)):       
+                    if(self.jogadaValida(i, j, tabuleiroFimJogo, 1, jogadorAtual)):       
                         return 0
         return 1
  
-    def isFimJogo(self, tabuleiroFimJogo, alterna):
+    def isFimJogo(self, tabuleiroFimJogo, alterna, jogadorAtual):
         fim = 1         # 1 = fim de jogo; 0 = continua jogo
         todosVermelho = 1       # 1 = nao existe peca preta, vermelho ganhou
         todosPreto = 1          # 1 = nao existe peca vermelha, preto ganhou
@@ -139,20 +156,26 @@ class Tabuleiro:
         if (not(fim)):
             fim = 1
             # Verificacao de passar a vez
-            if not self.isPassaVez(tabuleiroFimJogo):
+            if not self.isPassaVez(tabuleiroFimJogo, jogadorAtual):
                 return 0
             
             #Se chegou aqui significa que o jogador atual nao tem mais jogadas validas                        
             #print " Passou a vez "
-            self.alternador()
-            if self.isPassaVez(tabuleiroFimJogo):
+            if jogadorAtual == 1:
+                player = 2
+            else:
+                player = 1
+            if self.isPassaVez(tabuleiroFimJogo, player):
                 return 1
             if alterna:
                 self.alternador()
-        return fim
+            return 0
+        else:
+            return 1
         
-    def fimJogo(self, tabuleiroFimJogo):        
-        if (self.isFimJogo(tabuleiroFimJogo, 1)):
+        
+    def fimJogo(self, tabuleiroFimJogo, jogadorAtual):        
+        if (self.isFimJogo(tabuleiroFimJogo, 1, jogadorAtual)):
             print " Fim do Jogo "            
             self.pontuacao()
             if self.pontosVermelho > self.pontosPreto:
@@ -184,14 +207,17 @@ class Tabuleiro:
         if y < self.offset[1] or y > self.size[1] + self.offset[1]:
             return
 
-        peca = self.tabuleiro[self.map(x, 0)][self.map(y, 1)]
+        mapX = self.map(x,0)
+        mapY = self.map(y,1)
+        
+        peca = self.tabuleiro[mapX][mapY]
 
-        if peca.estado == 0 and self.jogadaValida(self.map(x, 0), self.map(y, 1), self.tabuleiro, 0) == 1:
+        if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
             peca.estado = self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
             if self.ai and self.human and not self.fim:
-                self.tabuleiro = self.minimax(self.tabuleiro, 3, 0, 1, self.atual, self.heuristicas[0])[1]
+                self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[0])[1]
                 self.alternador()
                 self.fim = self.fimJogo(self.tabuleiro, self.atual)
                 self.pontuacao()
@@ -199,7 +225,7 @@ class Tabuleiro:
         
         
 
-    def jogadaValida(self, i, j, tabuleiroFimJogo, verifica): #0:jogadaInvalida, 1:jogadaValida 
+    def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 
         todosVirar = []
         virar = []
         jogadaValida = 0
@@ -207,7 +233,7 @@ class Tabuleiro:
         for a in range(7 - i): # Para direita
             col = i + a + 1
             peca = tabuleiroFimJogo[col][j]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -222,7 +248,7 @@ class Tabuleiro:
         for a in range(i): # Para esquerda
             col = i - (a + 1)
             peca = tabuleiroFimJogo[col][j]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -238,7 +264,7 @@ class Tabuleiro:
         for a in range(7 - j): # Para baixo
             lin = j + a + 1
             peca = tabuleiroFimJogo[i][lin]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -253,7 +279,7 @@ class Tabuleiro:
         for a in range(j): # Para cima
             lin = j - (a + 1)
             peca = tabuleiroFimJogo[i][lin]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -274,7 +300,7 @@ class Tabuleiro:
                 if(lin > 7 or col > 7 or lin < 0 or col < 0):
                     break
                 peca = tabuleiroFimJogo[col][lin]
-                resposta = self.verificaJogada(peca, a)
+                resposta = self.verificaJogada(peca, a, jogadorAtual)
                 if resposta == 1:
                     if (not(verifica)):
                         todosVirar.append(virar)
@@ -293,7 +319,7 @@ class Tabuleiro:
                 if(lin > 7 or col > 7 or lin < 0 or col < 0):
                     break
                 peca = tabuleiroFimJogo[col][lin]
-                resposta = self.verificaJogada(peca, a)
+                resposta = self.verificaJogada(peca, a, jogadorAtual)
                 if resposta == 1:
                     if (not(verifica)):
                         todosVirar.append(virar)
@@ -312,7 +338,7 @@ class Tabuleiro:
                 if(lin > 7 or col > 7 or lin < 0 or col < 0):
                     break
                 peca = tabuleiroFimJogo[col][lin]
-                resposta = self.verificaJogada(peca, a)
+                resposta = self.verificaJogada(peca, a, jogadorAtual)
                 if resposta == 1:
                     if (not(verifica)):
                         todosVirar.append(virar)
@@ -330,7 +356,7 @@ class Tabuleiro:
             if(lin > 7 or col > 7 or lin < 0 or col < 0):
                 break
             peca = tabuleiroFimJogo[col][lin]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -344,24 +370,20 @@ class Tabuleiro:
 
         # Se a jogada for valida, da o flip nas pecas para a cor do jogador corrente
         if ((jogadaValida == 1) and (not(verifica))):
-            if self.last == 1:
-                cor = 2
-            else:
-                cor = 1
             for t in todosVirar:
                 for t0 in t:
-                    t0.estado = cor
+                    t0.flip()
         #elif((jogadaValida != 1) and (not(verifica))):
             #print "Erro: Jogada Invalida"           
                 
         return jogadaValida
 
-    def verificaJogada(self, peca, a): # 1:jogadaValida, 0:continua, 2:para
+    def verificaJogada(self, peca, a, jogadorAtual): # 1:jogadaValida, 0:continua, 2:para
         if peca.estado == 0:
             return 2
 
         # Se a peca que esta percorrendo e a mesma do jogador atual e ha pelo menos uma peca entre as duas
-        if peca.estado != self.last:
+        if peca.estado == jogadorAtual:
             if a > 0:
                 return 1
             else:
@@ -515,8 +537,10 @@ class Tabuleiro:
     def alternador(self):
         if self.last == 1:
             self.last = 2
+            self.atual = 1
             self.tempo = self.tempoVermelho
         else:
             self.last = 1
+            self.atual = 2
             self.tempo = self.tempoPreto
         return self.last
