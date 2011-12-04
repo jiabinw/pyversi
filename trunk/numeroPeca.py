@@ -8,7 +8,7 @@ class NumeroPeca:
     contador = 0
     
     # Entrada o tabuleiro e qual o eh o jogador atual
-    def numeroPecaContador(self, tabuleiro, jogadorAtual):	
+    def calcula(self, tabuleiro, jogadorAtual):	
 	
         for i in range(8):
             for j in range(8):
