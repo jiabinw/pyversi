@@ -67,7 +67,7 @@ class Tabuleiro:
     def refresh(self):
         
         if not self.human and not self.fim:
-            self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[self.atual - 1])[1]
+            self.tabuleiro = self.minimax(self.tabuleiro,3, 1, 1, self.atual, self.heuristicas[self.atual - 1])[1]
             self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
@@ -488,7 +488,10 @@ class Tabuleiro:
         
         # Caso base, ja iterou em toda a profundidade, ou jogo acabou
         if ((profundidade == 0) or (self.isFimJogo(tabuleiroMiniMax, 0, jogadorAtual))):
-            return (heuristica.calcula(tabuleiroMiniMax, jogadorAtual), tabuleiroMiniMax)
+            if (donoNivel):
+                return (heuristica.calcula(tabuleiroMiniMax, jogadorAtual), tabuleiroMiniMax)
+            else:
+                return (heuristica.calcula(tabuleiroMiniMax, proximoJogador), tabuleiroMiniMax)
         
         valoresAvaliacao = []
         novoTab = copy.deepcopy(tabuleiroMiniMax)
@@ -517,7 +520,7 @@ class Tabuleiro:
                     else:  
                         maximo[1] = tabuleiroMiniMax
             return (maximo[0], maximo[1])
-            
+                
         # Jogada na vez do min
         else:
             minimo = [float("inf"), None]
