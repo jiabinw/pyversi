@@ -12,6 +12,7 @@ class Tabuleiro:
     pontosVermelho = 0
     pontosPreto = 0
     last = 2
+    atual = 1
     tempo = 0
     tempoVermelho = 0
     tempoPreto = 0
@@ -82,17 +83,17 @@ class Tabuleiro:
 
         self.tempo = self.tempo + self.tempoAdicionar
         
-    def isPassaVez(self, tabuleiroFimJogo):
+    def isPassaVez(self, tabuleiroFimJogo, jogadorAtual):
         for i in range(8):
             for j in range(8):
                 item = tabuleiroFimJogo[i][j]
                 if (item.estado == 0):
                     #jogador atual ainda tem jogada valida
-                    if(self.jogadaValida(i, j, tabuleiroFimJogo, 1)):       
+                    if(self.jogadaValida(i, j, tabuleiroFimJogo, 1, jogadorAtual)):       
                         return 0
         return 1
  
-    def isFimJogo(self, tabuleiroFimJogo, alterna):
+    def isFimJogo(self, tabuleiroFimJogo, alterna, jogadorAtual):
         fim = 1         # 1 = fim de jogo; 0 = continua jogo
         todosVermelho = 1       # 1 = nao existe peca preta, vermelho ganhou
         todosPreto = 1          # 1 = nao existe peca vermelha, preto ganhou
@@ -114,20 +115,26 @@ class Tabuleiro:
         if (not(fim)):
             fim = 1
             # Verificacao de passar a vez
-            if not self.isPassaVez(tabuleiroFimJogo):
+            if not self.isPassaVez(tabuleiroFimJogo, jogadorAtual):
                 return 0
             
             #Se chegou aqui significa que o jogador atual nao tem mais jogadas validas                        
             print " Passou a vez "
-            self.alternador()
-            if self.isPassaVez(tabuleiroFimJogo):
+            if jogadorAtual == 1:
+                player = 2
+            else:
+                player = 1
+            if self.isPassaVez(tabuleiroFimJogo, player):
                 return 1
             if alterna:
                 self.alternador()
-        return fim
+            return 0
+        else:
+            return 1
         
-    def fimJogo(self, tabuleiroFimJogo):        
-        if (self.isFimJogo(tabuleiroFimJogo, 1)):
+        
+    def fimJogo(self, tabuleiroFimJogo, jogadorAtual):        
+        if (self.isFimJogo(tabuleiroFimJogo, 1, jogadorAtual)):
             print " Fim do Jogo "            
             self.pontuacao()
             if self.pontosVermelho > self.pontosPreto:
@@ -162,15 +169,15 @@ class Tabuleiro:
         
         peca = self.tabuleiro[mapX][mapY]
 
-        if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0):
+        if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
             peca.estado = self.alternador()
         
-        self.fimJogo(self.tabuleiro)
+        self.fimJogo(self.tabuleiro, self.atual)
         self.pontuacao()
         
         
 
-    def jogadaValida(self, i, j, tabuleiroFimJogo, verifica): #0:jogadaInvalida, 1:jogadaValida 
+    def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 
         todosVirar = []
         virar = []
         jogadaValida = 0
@@ -178,7 +185,7 @@ class Tabuleiro:
         for a in range(7 - i): # Para direita
             col = i + a + 1
             peca = tabuleiroFimJogo[col][j]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -193,7 +200,7 @@ class Tabuleiro:
         for a in range(i): # Para esquerda
             col = i - (a + 1)
             peca = tabuleiroFimJogo[col][j]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -209,7 +216,7 @@ class Tabuleiro:
         for a in range(7 - j): # Para baixo
             lin = j + a + 1
             peca = tabuleiroFimJogo[i][lin]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -224,7 +231,7 @@ class Tabuleiro:
         for a in range(j): # Para cima
             lin = j - (a + 1)
             peca = tabuleiroFimJogo[i][lin]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -245,7 +252,7 @@ class Tabuleiro:
                 if(lin > 7 or col > 7 or lin < 0 or col < 0):
                     break
                 peca = tabuleiroFimJogo[col][lin]
-                resposta = self.verificaJogada(peca, a)
+                resposta = self.verificaJogada(peca, a, jogadorAtual)
                 if resposta == 1:
                     if (not(verifica)):
                         todosVirar.append(virar)
@@ -264,7 +271,7 @@ class Tabuleiro:
                 if(lin > 7 or col > 7 or lin < 0 or col < 0):
                     break
                 peca = tabuleiroFimJogo[col][lin]
-                resposta = self.verificaJogada(peca, a)
+                resposta = self.verificaJogada(peca, a, jogadorAtual)
                 if resposta == 1:
                     if (not(verifica)):
                         todosVirar.append(virar)
@@ -283,7 +290,7 @@ class Tabuleiro:
                 if(lin > 7 or col > 7 or lin < 0 or col < 0):
                     break
                 peca = tabuleiroFimJogo[col][lin]
-                resposta = self.verificaJogada(peca, a)
+                resposta = self.verificaJogada(peca, a, jogadorAtual)
                 if resposta == 1:
                     if (not(verifica)):
                         todosVirar.append(virar)
@@ -301,7 +308,7 @@ class Tabuleiro:
             if(lin > 7 or col > 7 or lin < 0 or col < 0):
                 break
             peca = tabuleiroFimJogo[col][lin]
-            resposta = self.verificaJogada(peca, a)
+            resposta = self.verificaJogada(peca, a, jogadorAtual)
             if resposta == 1:
                 if (not(verifica)):
                     todosVirar.append(virar)
@@ -323,12 +330,12 @@ class Tabuleiro:
                 
         return jogadaValida
 
-    def verificaJogada(self, peca, a): # 1:jogadaValida, 0:continua, 2:para
+    def verificaJogada(self, peca, a, jogadorAtual): # 1:jogadaValida, 0:continua, 2:para
         if peca.estado == 0:
             return 2
 
         # Se a peca que esta percorrendo e a mesma do jogador atual e ha pelo menos uma peca entre as duas
-        if peca.estado != self.last:
+        if peca.estado == jogadorAtual:
             if a > 0:
                 return 1
             else:
@@ -347,67 +354,67 @@ class Tabuleiro:
                 elif peca.estado == 2:
                     self.pontosPreto = self.pontosPreto + 1
                     
-	# Funcao que cria a arvore do alfa-beta prunning
-	def minimax(self, tabuleiroMiniMax, profundidade):
-	
-		if (profundidade == 0):
-			return self.funcaoAvaliacao(tabuleiroMiniMax)
-	
-		# Procuro por uma peca do jogador adversario (self.last)
-		for i in range(8):
-		 		for j in range(8):
-					item = tabuleiroMiniMax[i][j]
-					# Local vazio
-					if (item.estado == 0):
-						break
+        # Funcao que cria a arvore do alfa-beta prunning
+        def minimax(self, tabuleiroMiniMax, profundidade):
+        
+                if (profundidade == 0):
+                        return self.funcaoAvaliacao(tabuleiroMiniMax)
+        
+                # Procuro por uma peca do jogador adversario (self.last)
+                for i in range(8):
+                                for j in range(8):
+                                        item = tabuleiroMiniMax[i][j]
+                                        # Local vazio
+                                        if (item.estado == 0):
+                                                break
 
-					# Peca do adversario
-					elif (item.estado == self.last):
-			
-						# percorro a linha acima, da esquerda pra direita
-						if (i > 0):
-							linha = i - 1
-							for a in range(-1, 1):
-								coluna = j + a
-								novoTab = copy.deepcopy(tabuleiroMiniMax)
-								item = novoTab[linha][coluna]
-								if (coluna >= 0 and coluna <= 7 and item.estado == 0):
-									jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
-									if (jogVal):
-										fimJogo = self.isFimJogo(novoTab, 0)
-										if (not(fimJogo)):
-											minimax(novoTab, profundidade - 1)
-									
-			
-						# percorro a linha abaixo, da esquerda pra direita
-						if (i < 7):
-							linha = i + 1
-							for a in range(-1, 1):
-								coluna = j + a
-								novoTab = copy.deepcopy(tabuleiroMiniMax)
-								item = novoTab[linha][coluna]
-								if (coluna >= 0 and coluna <= 7 and item.estado == 0):
-									jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
-									if (jogVal):
-										fimJogo = self.isFimJogo(novoTab, 0)
-										if (not(fimJogo)):
-											minimax(novoTab, profundidade - 1)
-			
-						# percorro a linha da peca, da esquerda pra direita
-						linha = i
-						for a in range(-1, 2, 2):
-							novoTab = copy.deepcopy(tabuleiroMiniMax)
-							item = novoTab[linha][coluna]
-							if (coluna >= 0 and coluna <= 7 and item.estado == 0):
-								jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
-								if (jogVal):
-										fimJogo = self.isFimJogo(novoTab, 0)
-										if (not(fimJogo)):
-											minimax(novoTab, profundidade - 1)			
+                                        # Peca do adversario
+                                        elif (item.estado == self.last):
+                        
+                                                # percorro a linha acima, da esquerda pra direita
+                                                if (i > 0):
+                                                        linha = i - 1
+                                                        for a in range(-1, 1):
+                                                                coluna = j + a
+                                                                novoTab = copy.deepcopy(tabuleiroMiniMax)
+                                                                item = novoTab[linha][coluna]
+                                                                if (coluna >= 0 and coluna <= 7 and item.estado == 0):
+                                                                        jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
+                                                                        if (jogVal):
+                                                                                fimJogo = self.isFimJogo(novoTab, 0)
+                                                                                if (not(fimJogo)):
+                                                                                        minimax(novoTab, profundidade - 1)
+                                                                        
+                        
+                                                # percorro a linha abaixo, da esquerda pra direita
+                                                if (i < 7):
+                                                        linha = i + 1
+                                                        for a in range(-1, 1):
+                                                                coluna = j + a
+                                                                novoTab = copy.deepcopy(tabuleiroMiniMax)
+                                                                item = novoTab[linha][coluna]
+                                                                if (coluna >= 0 and coluna <= 7 and item.estado == 0):
+                                                                        jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
+                                                                        if (jogVal):
+                                                                                fimJogo = self.isFimJogo(novoTab, 0)
+                                                                                if (not(fimJogo)):
+                                                                                        minimax(novoTab, profundidade - 1)
+                        
+                                                # percorro a linha da peca, da esquerda pra direita
+                                                linha = i
+                                                for a in range(-1, 2, 2):
+                                                        novoTab = copy.deepcopy(tabuleiroMiniMax)
+                                                        item = novoTab[linha][coluna]
+                                                        if (coluna >= 0 and coluna <= 7 and item.estado == 0):
+                                                                jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
+                                                                if (jogVal):
+                                                                                fimJogo = self.isFimJogo(novoTab, 0)
+                                                                                if (not(fimJogo)):
+                                                                                        minimax(novoTab, profundidade - 1)                      
 
-					# Peca do jogador atual
-					else:
-						break                    
+                                        # Peca do jogador atual
+                                        else:
+                                                break                    
 
         
     def map(self, x, i):
@@ -416,8 +423,10 @@ class Tabuleiro:
     def alternador(self):
         if self.last == 1:
             self.last = 2
+            self.atual = 1
             self.tempo = self.tempoVermelho
         else:
             self.last = 1
+            self.atual = 2
             self.tempo = self.tempoPreto
         return self.last
