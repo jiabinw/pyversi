@@ -19,6 +19,7 @@ class Tabuleiro:
     tempoAdicionar = 1.9
     ai = 0
     human = 0
+    fim = 0
     
     def __init__(self, game, ai1 = -1, ai2 = -1):
         self.font = pygame.font.SysFont("Courier New", 18)
@@ -33,17 +34,24 @@ class Tabuleiro:
         
         if ai1 != -1:
             self.ai = 1
+            if ai1 == 0:
+                self.heuristicas[0] = numeroPeca()
             
         if ai1 != -1 and ai2 != -1:
             self.ai = 1
+            if ai2 ==0:
+                self.heuristicas[1] = numeroPeca()
         else:
             self.human = 1
+            
+        
         
     def refresh(self):
         
-        if not self.human:
+        if not self.human and not self.fim:
             #self.tabuleiro = minimax()
             self.alternador()
+            self.fim = isFimJogo(self.tabuleiro, 1, self.atual)
         
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
@@ -157,6 +165,8 @@ class Tabuleiro:
                 print " Preto ganhou "
             else:
                 print " Empate "
+            return 1
+        return 0
                 
     def initPecas(self):
         for i in range(8):
@@ -186,10 +196,10 @@ class Tabuleiro:
         if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
             peca.estado = self.alternador()
         
-        self.fimJogo(self.tabuleiro, self.atual)
+        self.fim = self.fimJogo(self.tabuleiro, self.atual)
         self.pontuacao()
         
-        if self.ai and self.human:
+        if self.ai and self.human and not self.fim:
             #self.tabuleiro = minimax()
             self.alternador()
         
