@@ -18,7 +18,18 @@ class Game:
                 else:
                     self.app.event(event) 
         
-        elif self.estadoJogo == 1 or self.estadoJogo == 2:
+        elif self.estadoJogo == 1:
+           for event in events: 
+                if event.type == QUIT: 
+                    sys.exit(0)
+                elif event.type == MOUSEBUTTONDOWN:
+                    if event.dict['pos'][0] > 120 and event.dict['pos'][0] < 185 and event.dict['pos'][1] > 270 and event.dict['pos'][1] < 335:
+						print "1 jogador"
+                    self.app.event(event)
+                else:
+                    self.app.event(event)
+        
+        elif self.estadoJogo == 2:
            for event in events: 
                 if event.type == QUIT: 
                     sys.exit(0)
@@ -28,7 +39,7 @@ class Game:
                 else:
                     self.app.event(event)
 
-	elif self.estadoJogo == 3:
+        elif self.estadoJogo == 3:
            for event in events: 
                 if event.type == QUIT: 
                     sys.exit(0)
@@ -100,7 +111,7 @@ class Game:
 			c.add(form,70,80)
 			self.app.init(c)
 	
-		elif self.estadoJogo == 1 or self.estadoJogo == 2:
+		elif self.estadoJogo == 2:
 			formf=gui.Form()
 			self.app = gui.App()
 			form = gui.Table()
@@ -114,6 +125,37 @@ class Game:
 		
 			self.app.init(c)
 			self.tab = Tabuleiro(pygame)
+
+		elif self.estadoJogo == 1:
+			self.app = gui.App()
+			c = gui.Container(align=-1,valign=-1)
+
+			vs = gui.Image("vs.png", width=160, height=160)
+			c.add(vs, 75, 225)		
+			
+			computador = gui.List(width=125, height=155)
+			computador.add("Pontuacao", value=0)
+			computador.add("Mobilidade", value=1)
+			computador.add("Captura", value=2)
+			computador.add("Posicionamento", value=3)
+			computador.add("HeuristicaX", value=4)
+			computador.add("HeuristicaY", value=5)
+			computador.add("HeuristicaZ", value=6)
+			c.add(computador, 95, 100)
+
+			e = gui.Button("Voltar")
+			e.connect(gui.CLICK, self.novoJogoEventHandler, None)
+			c.add(e, 5, 5)
+		
+			form = gui.Table()
+			form.tr()
+			form.td(gui.Label("Computador", color=(127,32,50)), width=128)
+			c.add(form, 95, 60)
+
+			a = gui.Label("HEURISTICA", color=(127,32,50))
+			c.add(a, 110, 30)
+
+			self.app.init(c)
 
 		elif self.estadoJogo == 3:
 			self.app = gui.App()
@@ -158,7 +200,7 @@ class Game:
 			self.app.init(c)
 
     def loop(self):
-		if self.estadoJogo == 1 or self.estadoJogo == 2:
+		if self.estadoJogo == 2:
 			self.tab.refresh()
 			
 		self.app.paint()
