@@ -157,9 +157,12 @@ class Tabuleiro:
         if y < self.offset[1] or y > self.size[1] + self.offset[1]:
             return
 
-        peca = self.tabuleiro[self.map(x, 0)][self.map(y, 1)]
+        mapX = self.map(x,0)
+        mapY = self.map(y,1)
+        
+        peca = self.tabuleiro[mapX][mapY]
 
-        if peca.estado == 0 and self.jogadaValida(self.map(x, 0), self.map(y, 1), self.tabuleiro, 0) == 1:
+        if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0):
             peca.estado = self.alternador()
         
         self.fimJogo(self.tabuleiro)
@@ -312,13 +315,9 @@ class Tabuleiro:
 
         # Se a jogada for valida, da o flip nas pecas para a cor do jogador corrente
         if ((jogadaValida == 1) and (not(verifica))):
-            if self.last == 1:
-                cor = 2
-            else:
-                cor = 1
             for t in todosVirar:
                 for t0 in t:
-                    t0.estado = cor
+                    t0.flip()
         elif((jogadaValida != 1) and (not(verifica))):
             print "Erro: Jogada Invalida"           
                 
