@@ -18,7 +18,7 @@ class Tabuleiro:
     tempoPreto = 0
     tempoAdicionar = 1.9
     
-    def __init__(self, game):
+    def __init__(self, game, ai1 = -1, ai2 = -1):
         self.font = pygame.font.SysFont("Courier New", 18)
         self.pygame = game       
         self.ImgSurface = self.pygame.image.load(self.IMGPATH)
@@ -28,6 +28,7 @@ class Tabuleiro:
             self.tabuleiro.append(copy.deepcopy(row))
             
         self.initPecas()
+               
         
     def refresh(self):
         
