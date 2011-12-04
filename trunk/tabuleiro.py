@@ -346,6 +346,68 @@ class Tabuleiro:
                     self.pontosVermelho = self.pontosVermelho + 1
                 elif peca.estado == 2:
                     self.pontosPreto = self.pontosPreto + 1
+                    
+	# Funcao que cria a arvore do alfa-beta prunning
+	def minimax(self, tabuleiroMiniMax, profundidade):
+	
+		if (profundidade == 0):
+			return self.funcaoAvaliacao(tabuleiroMiniMax)
+	
+		# Procuro por uma peca do jogador adversario (self.last)
+		for i in range(8):
+		 		for j in range(8):
+					item = tabuleiroMiniMax[i][j]
+					# Local vazio
+					if (item.estado == 0):
+						break
+
+					# Peca do adversario
+					elif (item.estado == self.last):
+			
+						# percorro a linha acima, da esquerda pra direita
+						if (i > 0):
+							linha = i - 1
+							for a in range(-1, 1):
+								coluna = j + a
+								novoTab = copy.deepcopy(tabuleiroMiniMax)
+								item = novoTab[linha][coluna]
+								if (coluna >= 0 and coluna <= 7 and item.estado == 0):
+									jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
+									if (jogVal):
+										fimJogo = self.isFimJogo(novoTab, 0)
+										if (not(fimJogo)):
+											minimax(novoTab, profundidade - 1)
+									
+			
+						# percorro a linha abaixo, da esquerda pra direita
+						if (i < 7):
+							linha = i + 1
+							for a in range(-1, 1):
+								coluna = j + a
+								novoTab = copy.deepcopy(tabuleiroMiniMax)
+								item = novoTab[linha][coluna]
+								if (coluna >= 0 and coluna <= 7 and item.estado == 0):
+									jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
+									if (jogVal):
+										fimJogo = self.isFimJogo(novoTab, 0)
+										if (not(fimJogo)):
+											minimax(novoTab, profundidade - 1)
+			
+						# percorro a linha da peca, da esquerda pra direita
+						linha = i
+						for a in range(-1, 2, 2):
+							novoTab = copy.deepcopy(tabuleiroMiniMax)
+							item = novoTab[linha][coluna]
+							if (coluna >= 0 and coluna <= 7 and item.estado == 0):
+								jogVal = self.jogadaValida(linha, coluna, novoTab, 0)
+								if (jogVal):
+										fimJogo = self.isFimJogo(novoTab, 0)
+										if (not(fimJogo)):
+											minimax(novoTab, profundidade - 1)			
+
+					# Peca do jogador atual
+					else:
+						break                    
 
         
     def map(self, x, i):
