@@ -21,11 +21,11 @@ class NumeroPeca:
 	      if jogadorAtual == 1 :
 		if novoTab.pontosVermelho > maxPontuacao:
 		  maxPontuacao = novoTab.pontosVermelho
-		  melhorJogada = [i,j];
+		  melhorJogada = [i,j]
 	      else
 		if novoTab.pontosPreto > maxPontuacao:
 		  maxPontuacao = novoTab.pontosPreto
-		  melhorJogada = [i,j];
+		  melhorJogada = [i,j]
 		
                 
              
