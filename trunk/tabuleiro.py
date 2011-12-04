@@ -17,6 +17,8 @@ class Tabuleiro:
     tempoVermelho = 0
     tempoPreto = 0
     tempoAdicionar = 1.9
+    ai = 0
+    human = 0
     
     def __init__(self, game, ai1 = -1, ai2 = -1):
         self.font = pygame.font.SysFont("Courier New", 18)
@@ -28,9 +30,20 @@ class Tabuleiro:
             self.tabuleiro.append(copy.deepcopy(row))
             
         self.initPecas()
-               
+        
+        if ai1 != -1:
+            ai = 1
+            
+        if ai1 != -1 and ai2 != -1:
+            ai = 1
+        else:
+            human = 1
         
     def refresh(self):
+        
+        if not human:
+            #self.tabuleiro = minimax()
+            self.alternador()
         
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
@@ -175,6 +188,10 @@ class Tabuleiro:
         
         self.fimJogo(self.tabuleiro, self.atual)
         self.pontuacao()
+        
+        if ai and human:
+            #self.tabuleiro = minimax()
+            self.alternador()
         
         
 
