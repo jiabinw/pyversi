@@ -32,16 +32,16 @@ class Tabuleiro:
         self.initPecas()
         
         if ai1 != -1:
-            ai = 1
+            self.ai = 1
             
         if ai1 != -1 and ai2 != -1:
-            ai = 1
+            self.ai = 1
         else:
-            human = 1
+            self.human = 1
         
     def refresh(self):
         
-        if not human:
+        if not self.human:
             #self.tabuleiro = minimax()
             self.alternador()
         
@@ -189,7 +189,7 @@ class Tabuleiro:
         self.fimJogo(self.tabuleiro, self.atual)
         self.pontuacao()
         
-        if ai and human:
+        if self.ai and self.human:
             #self.tabuleiro = minimax()
             self.alternador()
         
