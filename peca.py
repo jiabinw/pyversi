@@ -21,3 +21,9 @@ class Peca:
     
     def __repr__(self):
         return "Peca com estado " + str(self.estado)
+        
+    def flip(self):
+        if self.estado == 1:
+            self.estado = 2 
+        elif self.estado == 2:
+            self.estado = 1    
