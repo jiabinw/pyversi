@@ -13,7 +13,7 @@ class NumeroPeca:
         for i in range(8):
             for j in range(8):
 	      peca = tabuleiro[i][j]
-	      if jogadorAtual == 1 :
+	      if peca.estado == 1 :
 		contador += contador	
 		
          contador = contador*100/64       
