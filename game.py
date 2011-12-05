@@ -38,81 +38,58 @@ class Game:
     #######################################################
 
     
-    
-    
     def input(self,events):
-        if self.estadoJogo == 0 or self.estadoJogo == 5:
-           for event in events: 
-                if event.type == QUIT: 
-                    sys.exit(0)
-                else:
-                    self.app.event(event) 
-        
-        elif self.estadoJogo == 1:
-           for event in events: 
-                if event.type == QUIT: 
-                    sys.exit(0)
-                elif event.type == MOUSEBUTTONDOWN:
-                    if event.dict['pos'][0] > 120 and event.dict['pos'][0] < 185 and event.dict['pos'][1] > 270 and event.dict['pos'][1] < 335:
-                        self.ai1 = self.heuristica1.value
-                        self.inicializado = 0
-                        self.estadoJogo = 4
-                    self.app.event(event)
-                else:
-                    self.app.event(event)
-        
-        elif self.estadoJogo == 2 or self.estadoJogo == 4:
-           for event in events: 
-                if event.type == QUIT: 
-                    sys.exit(0)
-                elif event.type == MOUSEBUTTONDOWN:
+        for event in events:
+            if event.type == MOUSEBUTTONDOWN:
+                # O tabuleiro somente aceita acao de click do usuario se nao for IA versus IA
+                if self.estadoJogo == 2 or self.estadoJogo == 4:
                     self.botaoHabilitado = self.tab.click(event.dict['pos'][0],event.dict['pos'][1])
-                    self.app.event(event)
-                else:
-                    self.app.event(event)
-
-        elif self.estadoJogo == 3:
-           for event in events: 
-                if event.type == QUIT: 
-                    sys.exit(0)
-                elif event.type == MOUSEBUTTONDOWN:
-                    if event.dict['pos'][0] > 120 and event.dict['pos'][0] < 185 and event.dict['pos'][1] > 270 and event.dict['pos'][1] < 335:
+                
+                # Pegando a heuristica escolhida para o computador(es)
+                if (self.estadoJogo == 1 or (self.estadoJogo == 3 and self.heuristica2.value != None)) and self.heuristica1.value != None:
+                    # Mapeamento (posicao x e y) da botao versus neste estado
+                    if self.isClickPlayGame(event.dict['pos'][0], event.dict['pos'][1]):                       
                         self.ai1 = self.heuristica1.value
-                        self.ai2 = self.heuristica2.value
                         self.inicializado = 0
-                        self.estadoJogo = 5 
-                    self.app.event(event)
-                else:
-                    self.app.event(event)
+                        
+                        if self.estadoJogo == 1:
+                            self.estadoJogo = 4
+                        else: # Se for IA vs IA pega a heuristica do segundo computador
+                            self.estadoJogo = 5
+                            self.ai2 = self.heuristica2.value
+                        
+        # Simplesmente dispara o evento para aplicacao ou a fecha se o usuario requisitou isso                
+        for event in events: 
+            if event.type == QUIT: 
+                sys.exit(0)
+            else:
+                self.app.event(event)   
+
+    def isClickPlayGame(self, x, y): # Mapeia o botao 'Play Game'
+        return x >= 95 and x <= 220 and y >= 330 and y <= 370
+
+    def novoJogoEventHandler(self, event):
+        self.novaEscolha(0)
 
     def umJogadorEventHandler(self, event):
-        self.estadoJogo = 1
-        self.inicializado = 0
-        self.ai1=-1
-        self.ai2=-1
+        self.novaEscolha(1)
 
     def doisJogadoresEventHandler(self, event):
-        self.estadoJogo = 2
-        self.inicializado = 0
-        self.ai1=-1
-        self.ai2=-1
+        self.novaEscolha(2)
         
-    def zeroJogadoresEventHandler(self, event):
-        self.estadoJogo = 3
-        self.inicializado = 0
-        self.ai1=-1
-        self.ai2=-1
-        
-    def novoJogoEventHandler(self, event):
-        self.estadoJogo = 0
-        self.inicializado = 0
-        self.ai1=-1
-        self.ai2=-1
+    def zeroJogadoresEventHandler(self, event):     
+        self.novaEscolha(3)       
         
     def passarVezEventHandler(self, event):
         self.tab.alternador()
+    
+    def novaEscolha(self, estado):
+        self.estadoJogo = estado
+        self.inicializado = 0
+        self.ai1 = -1
+        self.ai2 = -1   
 
-    def __init__(self):
+    def __init__(self): # Instancia a aplicacao
         pygame.init()
         window = pygame.display.set_mode((329, 389), pygame.HWSURFACE | pygame.DOUBLEBUF)
         pygame.display.set_caption('Reversi')
@@ -120,15 +97,23 @@ class Game:
             self.inicializa()
             self.inicializado = 1
             while self.inicializado:
-                window.fill((255,255,255))
+                window.fill((255, 255, 255))
                 self.loop()
 
-    def inicializa(self):
-        if self.estadoJogo == 0:
-            formf=gui.Form()
-            self.app = gui.App()
-            
-            form = gui.Table()
+    def inicializa(self): # Carrega a tela correspondente ao estado
+        self.app = gui.App()
+        c = gui.Container(align=-1,valign=-1)
+        
+        if self.estadoJogo == 0 or self.estadoJogo == 1 or self.estadoJogo == 3: # Nos estados que nao sao o tabuleiro coloque a arte padrao
+            im = gui.Image("titulo.png")
+            c.add(im, 0, 0)
+            im = gui.Image("fundo.png")
+            c.add(im, 0, 218)
+            im = gui.Image("fundo.png")
+            c.add(im, 0, 366)
+        
+        if self.estadoJogo == 0: # Tela inicial          
+            form = gui.Table()      
             
             form.tr()
             e = gui.Label("Escolha o modo de jogo")
@@ -144,107 +129,70 @@ class Game:
             form.tr()
             form.td(b, height=60)
 
-            c = gui.Button("0 jogadores")
-            c.connect(gui.CLICK, self.zeroJogadoresEventHandler, None)
+            d = gui.Button("0 jogadores")
+            d.connect(gui.CLICK, self.zeroJogadoresEventHandler, None)
             form.tr()
-            form.td(c)
+            form.td(d)
             
-            c = gui.Container(align=-1,valign=-1)
-            c.add(form,70,80)
-            self.app.init(c)
+            c.add(form, 70, 80)
 
-        elif self.estadoJogo == 2 or self.estadoJogo == 4 or self.estadoJogo == 5:
-            formf=gui.Form()
-            self.app = gui.App()
+        elif self.estadoJogo == 2 or self.estadoJogo == 4 or self.estadoJogo == 5: # Tela do tabuleiro          
             form = gui.Table()
             form.tr()
-            e = gui.Button("New Game")
+            e = gui.Button("Novo Jogo")
             e.connect(gui.CLICK, self.novoJogoEventHandler, None)
             form.td(e)
     
-            c = gui.Container(align=-1,valign=-1)
             c.add(form, 1, 1)
-    
-            self.app.init(c)
+
             self.tab = Tabuleiro(pygame, self.ai1, self.ai2)
 
-        elif self.estadoJogo == 1:
-            self.app = gui.App()
-            c = gui.Container(align=-1,valign=-1)
-
-            vs = gui.Image("vs.png", width=160, height=160)
-            c.add(vs, 75, 225)		
-            
-            computador = gui.List(width=125, height=155)
-            computador.add("Pontuacao", value=0)
-            computador.add("Mobilidade", value=1)
-            computador.add("Captura", value=2)
-            computador.add("Posicionamento", value=3)
-            computador.add("HeuristicaX", value=4)
-            computador.add("HeuristicaY", value=5)
-            computador.add("HeuristicaZ", value=6)
-            self.heuristica1 = computador
-            c.add(computador, 95, 100)
-
+        elif self.estadoJogo == 1 or self.estadoJogo == 3: # Escolha da heuristica do computador
             e = gui.Button("Voltar")
             e.connect(gui.CLICK, self.novoJogoEventHandler, None)
             c.add(e, 5, 5)
-    
-            form = gui.Table()
-            form.tr()
-            form.td(gui.Label("Computador", color=(127,32,50)), width=128)
-            c.add(form, 95, 60)
-
-            a = gui.Label("HEURISTICA", color=(127,32,50))
-            c.add(a, 110, 30)
-
-            self.app.init(c)
-
-        elif self.estadoJogo == 3:
-            self.app = gui.App()
-            c = gui.Container(align=-1,valign=-1)
-
-            vs = gui.Image("vs.png", width=160, height=160)
-            c.add(vs, 75, 225)		
             
-            jogador1 = gui.List(width=125, height=155)
-            jogador1.add("Pontuacao", value=0)
-            jogador1.add("Mobilidade", value=1)
-            jogador1.add("Captura", value=2)
-            jogador1.add("Posicionamento", value=3)
-            jogador1.add("HeuristicaX", value=4)
-            jogador1.add("HeuristicaY", value=5)
-            jogador1.add("HeuristicaZ", value=6)
-            self.heuristica1 = jogador1
-            c.add(jogador1, 15, 110)
-
-            jogador2 = gui.List(width=125, height=155)
-            jogador2.add("Pontuacao", value=0)
-            jogador2.add("Mobilidade", value=1)
-            jogador2.add("Captura", value=2)
-            jogador2.add("Posicionamento", value=3)
-            jogador2.add("HeuristicaX", value=4)
-            jogador2.add("HeuristicaY", value=5)
-            jogador2.add("HeuristicaZ", value=6)
-            self.heuristica2 = jogador2
-            c.add(jogador2, 200, 110)
-
-            e = gui.Button("Voltar")
-            e.connect(gui.CLICK, self.novoJogoEventHandler, None)
-            c.add(e, 5, 5)
-    
+            a = gui.Label("HEURISTICA / NIVEL", color=(0, 0, 0))
+            c.add(a, 85, 85)
+            
+            pg = gui.Image("playgame.png", width=125, height=40)
+            c.add(pg, 95, 330)
+            
             form = gui.Table()
             form.tr()
-            form.td(gui.Label("Jogador 1", color=(127,32,50)), width=128)
-            form.td(gui.Label("Jogador 2", color=(127,32,50)), width=240)
-            c.add(form, 15, 70)
+            if self.estadoJogo == 1: # Contra somente 1 jogador humano
+                form.td(gui.Label("Computador", color=(0, 0, 0)), width=128)
+                c.add(form, 95, 120)
+                
+                self.heuristica1 = self.listaHeuristicas()
+                c.add(self.heuristica1, 95, 150)
+            else: # Nenhuma jogador humano
+                form.td(gui.Label("Jogador 1", color=(0, 0, 0)), width=128)
+                form.td(gui.Label("Jogador 2", color=(0, 0, 0)), width=240)
+                c.add(form, 5, 120)
+                
+                self.heuristica1 = self.listaHeuristicas()
+                c.add(self.heuristica1, 5, 150)
+           
+                self.heuristica2 = self.listaHeuristicas()
+                c.add(self.heuristica2, 190, 150)
 
-            a = gui.Label("HEURISTICAS", color=(127,32,50))
-            c.add(a, 115, 30)
+        self.app.init(c)
 
-            self.app.init(c)
+    def listaHeuristicas(self): # Lista de Heuristicas do jogo
+        heuristicas = gui.List(width=125, height=155)
+        heuristicas.add("Expert", value=4)
+        heuristicas.add("Normal", value=5)
+        heuristicas.add("Easy", value=6)
+        heuristicas.add("----------", value=10)
+        heuristicas.add("Numero Peca", value=0)
+        heuristicas.add("Mobilidade", value=1)
+        heuristicas.add("Captura", value=2)
+        heuristicas.add("Peso Posicao", value=3)
+        
+        return heuristicas
 
-    def loop(self):
+    def loop(self): # Fica reescrevendo a tela e capturando evento baseado no estado do jogo
         if self.estadoJogo == 2 or self.estadoJogo == 4 or self.estadoJogo == 5:
             self.tab.refresh()
                 
@@ -253,4 +201,3 @@ class Game:
         self.input(pygame.event.get())
 
 game = Game()
-
