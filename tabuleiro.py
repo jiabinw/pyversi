@@ -67,7 +67,7 @@ class Tabuleiro:
     def refresh(self):
         
         if not self.human and not self.fim:
-            self.tabuleiro = self.minimax(self.tabuleiro,3, 1, 1, self.atual, self.heuristicas[self.atual - 1])[1]
+            self.tabuleiro = self.minimax(self.tabuleiro,3, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
             self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
@@ -217,7 +217,7 @@ class Tabuleiro:
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
             if self.ai and self.human and not self.fim:
-                self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[0])[1]
+                self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
                 self.alternador()
                 self.fim = self.fimJogo(self.tabuleiro, self.atual)
                 self.pontuacao()
@@ -474,13 +474,10 @@ class Tabuleiro:
     # heuristica = heuristica que sera usada 
     # Retorna tupla: (valor da funcao de avaliacao, tabuleiro)
     
-    def minimax(self, tabuleiroMiniMax, profundidade, donoNivel, primeiraChamada, jogadorAtual, heuristica):
-        mapeamento = []
-        row = [0]*8        
-        for item in row:
-            mapeamento.append(copy.deepcopy(row))
-        mapeamento.append([0,0])
-   
+    def minimax(self, tabuleiroMiniMax, profundidade, donoNivel, primeiraChamada, jogadorAtual, heuristica, alpha, beta):
+
+
+        #descobre o proximo jogador
         if (jogadorAtual == 1):
             proximoJogador = 2
         elif (jogadorAtual == 2):
@@ -488,51 +485,67 @@ class Tabuleiro:
         
         # Caso base, ja iterou em toda a profundidade, ou jogo acabou
         if ((profundidade == 0) or (self.isFimJogo(tabuleiroMiniMax, 0, jogadorAtual))):
-            if (donoNivel):
+            if donoNivel:
                 return (heuristica.calcula(tabuleiroMiniMax, jogadorAtual), tabuleiroMiniMax)
             else:
                 return (heuristica.calcula(tabuleiroMiniMax, proximoJogador), tabuleiroMiniMax)
         
-        valoresAvaliacao = []
+        
+        #heuristica de mapeamento para melhorar a performance da busca de jogadas validas
+        mapeamento = []
+        row = [0]*8        
+        for item in row:
+            mapeamento.append(copy.deepcopy(row))
+        mapeamento.append([0,0])
+           
+        maximo = [float("-inf"), None]
+        minimo = [float("inf"), None]
         novoTab = copy.deepcopy(tabuleiroMiniMax)
         jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
         while (jogadaAtual != (-1,-1)):
             # Verifico se a posicao retornada por proxima jogada eh uma jogada valida)
             if(self.jogadaValida(jogadaAtual[0],jogadaAtual[1], novoTab, 0, jogadorAtual)):
                 novoTab[jogadaAtual[0]][jogadaAtual[1]].estado = jogadorAtual
-                valoresAvaliacao.append(self.minimax(novoTab, profundidade - 1, not(donoNivel), 0, proximoJogador, heuristica))
-                novoTab = copy.deepcopy(tabuleiroMiniMax)
+                atual = self.minimax(novoTab, profundidade - 1, not(donoNivel), 0, proximoJogador, heuristica, alpha, beta)
+                
+                if donoNivel:
+                    if atual[0] > maximo[0]:
+                        maximo[0] = atual[0]
+                        if primeiraChamada:
+                            maximo[1] = atual[1]
+                        else:
+                            maximo[1] = tabuleiroMiniMax
+                    if atual[0] > alpha:
+                        alpha = atual[0]        
+                    if alpha >= beta:
+                        return (alpha,maximo[1])
+                else:
+                    if atual[0] < minimo[0]:
+                        minimo[0] = atual[0]
+                        if primeiraChamada:
+                            minimo[1] = atual[1]
+                        else:
+                            minimo[1] = tabuleiroMiniMax
+                    if atual[0] < beta:
+                        beta = atual[0]
+                    if alpha >= beta:
+                        return (beta,minimo[1]) 
+                            
+                #geramos um novo tabuleiro apenas se o atual foi modificado            
+                novoTab = copy.deepcopy(tabuleiroMiniMax)                               
             jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
         
         
         # Nenhuma jogada para o jogador atual, passo a vez
-        if (not valoresAvaliacao):
-            return self.minimax(tabuleiroMiniMax, profundidade - 1, not(donoNivel), 0, proximoJogador, heuristica)
+        if (donoNivel and maximo[1] == None) or ((not donoNivel) and minimo[1] == None):
+            return self.minimax(tabuleiroMiniMax, profundidade - 1, not(donoNivel), 0, proximoJogador, heuristica, alpha, beta)
         
-        # Jogada na vez do max
+        
         if (donoNivel):
-            maximo = [float("-inf"), None]
-            for elemento in valoresAvaliacao:
-                if elemento[0] > maximo[0]:
-                    maximo[0] = elemento[0]
-                    if (primeiraChamada):
-                        maximo[1] = elemento[1]
-                    else:  
-                        maximo[1] = tabuleiroMiniMax
-            return (maximo[0], maximo[1])
-                
-        # Jogada na vez do min
+            return (maximo[0],maximo[1])
         else:
-            minimo = [float("inf"), None]
-            for elemento in valoresAvaliacao:
-                if elemento[0] < minimo[0]:
-                    minimo[0] = elemento[0]
-                    if (primeiraChamada):
-                        minimo[1] = elemento[1]
-                    else:  
-                        minimo[1] = tabuleiroMiniMax
-            return (minimo[0], minimo[1])
-            
+            return (minimo[0],minimo[1])
+         
         
     def map(self, x, i):
         return int(round((x-self.offset[i])/41,0))
