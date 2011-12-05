@@ -105,11 +105,11 @@ class Game:
         c = gui.Container(align=-1,valign=-1)
         
         if self.estadoJogo == 0 or self.estadoJogo == 1 or self.estadoJogo == 3: # Nos estados que nao sao o tabuleiro coloque a arte padrao
-            im = gui.Image("titulo.png")
+            im = gui.Image("img/titulo.png")
             c.add(im, 0, 0)
-            im = gui.Image("fundo.png")
+            im = gui.Image("img/fundo.png")
             c.add(im, 0, 218)
-            im = gui.Image("fundo.png")
+            im = gui.Image("img/fundo.png")
             c.add(im, 0, 366)
         
         if self.estadoJogo == 0: # Tela inicial          
@@ -155,7 +155,7 @@ class Game:
             a = gui.Label("HEURISTICA / NIVEL", color=(0, 0, 0))
             c.add(a, 85, 85)
             
-            pg = gui.Image("playgame.png", width=125, height=40)
+            pg = gui.Image("img/playgame.png", width=125, height=40)
             c.add(pg, 95, 330)
             
             form = gui.Table()
