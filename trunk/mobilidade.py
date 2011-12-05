@@ -18,7 +18,7 @@ class Mobilidade: # Calcula quanto de Mobilidade o meu adversario tem. Quanto ma
                 if tabuleiro[i][j].estado == 0:
                     avaliacao += self.jogadaValida(i, j, tabuleiro, jogador, 1)
         
-        normalizado = ((28 - avaliacao) / float(28)) * 100
+        normalizado = ((28 - avaliacao) / float(64)) * 100
         
         return normalizado
         
