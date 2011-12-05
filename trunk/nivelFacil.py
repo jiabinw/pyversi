@@ -11,19 +11,13 @@ from faseDoJogo import *
 class NivelFacil:   
     
     # Calcula as heuristicas para o nivel facil, com peso para cada uma
-    def calcula(self, tabuleiro, jogadorAtual):
-        faseJogo = PesoPosicao().estadoJogo(tabuleiro) # Retorna quantos porcento de jogo já aconteceu.        
-        
+    def calcula(self, tabuleiro, jogadorAtual):   
         valorPosicao = valorCaptura = valorMobilidade = valorNrPecas = 0
         
-        # Posicao
-        pesoPosicao = 1 
-        # Mobilidade
-        pesoMobilidade = 1
-        # Captura 
+        pesoPosicao = pesoMobilidade = 0
+        
         pesoCaptura = 1
-        # Numero de Pecas
-        pesoNrPecas = 1
+        pesoNrPecas = 3
         
         if(pesoPosicao > 0):
             valorPosicao = PesoPosicao().calcula(tabuleiro, jogadorAtual)

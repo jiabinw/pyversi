@@ -12,18 +12,21 @@ class NivelDificil:
     
     # Calcula as heuristicas para o nivel facil, com peso para cada uma
     def calcula(self, tabuleiro, jogadorAtual):
-        faseJogo = PesoPosicao().estadoJogo(tabuleiro) # Retorna quantos porcento de jogo já aconteceu.        
+        faseJogo = FaseDoJogo().estadoJogo(tabuleiro) # Retorna quantos porcento de jogo ja aconteceu.        
         
-        valorPosicao = valorCaptura = valorMobilidade = valorNrPecas = 0
+        pesoPosicao = pesoCaptura = pesoMobilidade = pesoNrPecas = valorPosicao = valorCaptura = valorMobilidade = valorNrPecas = 0
         
-        # Posicao
-        pesoPosicao = 1 
-        # Mobilidade
-        pesoMobilidade = 1
-        # Captura 
-        pesoCaptura = 1
-        # Numero de Pecas
-        pesoNrPecas = 1
+        if faseJogo < 40:
+            pesoPosicao = 1
+            pesoCaptura = 1
+            pesoMobilidade = 2
+        elif faseJogo >= 40 and faseJogo < 80:
+            pesoPosicao = 2
+            pesoCaptura = 1
+            pesoMobilidade = 1
+            pesoNrPecas = 0.5
+        else: # TODO fazer forca-bruta em cima do numero de pecas. A partir do nivel maximo que o alpha beta prunning eh aconselhavel
+            pesoNrPecas = 1
         
         if(pesoPosicao > 0):
             valorPosicao = PesoPosicao().calcula(tabuleiro, jogadorAtual)

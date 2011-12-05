@@ -5,6 +5,9 @@ from numeroPeca import *
 from mobilidade import *
 from pesoPosicao import *
 from captura import *
+from nivelFacil import *
+from nivelMedio import *
+from nivelDificil import *
 
 class Tabuleiro:
     pygame = 0
@@ -12,7 +15,7 @@ class Tabuleiro:
     offset = (0,60)
     size = (341,341)
     tabuleiro = []
-    IMGPATH = os.path.join("img","tabuleiro.png")
+    IMGPATH = os.path.join("img", "tabuleiro.png")
     pontosVermelho = 0
     pontosPreto = 0
     last = 2
@@ -50,6 +53,12 @@ class Tabuleiro:
                 self.heuristicas.append(Captura())
             elif ai1 == 3:
                 self.heuristicas.append(PesoPosicao())
+            elif ai1 == 4:
+                self.heuristicas.append(NivelFacil())
+            elif ai1 == 5:
+                self.heuristicas.append(NivelMedio())
+            elif ai1 == 6:
+                self.heuristicas.append(NivelDificil())
         if ai1 != -1 and ai2 != -1:
             self.ai = 1
             if ai2 ==0:
@@ -60,6 +69,12 @@ class Tabuleiro:
                 self.heuristicas.append(Captura())
             elif ai2 == 3:
                 self.heuristicas.append(PesoPosicao())
+            elif ai2 == 4:
+                self.heuristicas.append(NivelFacil())
+            elif ai2 == 5:
+                self.heuristicas.append(NivelMedio())
+            elif ai2 == 6:
+                self.heuristicas.append(NivelDificil())
         else:
             self.human = 1
             
