@@ -7,52 +7,50 @@ class Captura:
   
     novoTab = []
       
-    def calcula(self, tabuleiro, jogadorProx):	     
-      
-      if len(self.novoTab) == 0: #inicializa
-	row = [0]*8        
-	for item in row:
-	  self.novoTab.append(copy.deepcopy(row))
-      else:  #somente atualiza
-	for i in range(8):
-	  for j in range(8):            
-	    self.novoTab[i][j] = 0
-	  
-      contador = 0
-      contadorAtual = 0
+    def calcula(self, tabuleiro, jogadorProx):         
+        if len(self.novoTab) == 0: #inicializa
+            row = [0] * 8        
+            for item in row:
+                self.novoTab.append(copy.deepcopy(row))
+        else:  #somente atualiza
+            for i in range(8):
+                for j in range(8):            
+                    self.novoTab[i][j] = 0
+
+        contador = 0
+        contadorAtual = 0
      
-      for i in range(8):
-	for j in range(8):
-	  if tabuleiro[i][j].estado == 0:
-	   self.jogadaValida(i, j, tabuleiro, 0, jogadorProx)
-	  
-      for i in range(8):
-	for j in range(8):
-	  contador = contador + self.novoTab[i][j]
+        for i in range(8):
+            for j in range(8):
+                if tabuleiro[i][j].estado == 0:
+                    self.jogadaValida(i, j, tabuleiro, 0, jogadorProx)
+
+        for i in range(8):
+            for j in range(8):
+                contador = contador + self.novoTab[i][j]
+                
+        if jogadorProx == 1:
+            jogadorAtual = 2
+        else:
+            jogadorAtual = 1
      
-      if jogadorProx == 1:
-	jogadorAtual = 2
-      else:
-	jogadorAtual = 1
+        for i in range(8):
+            for j in range(8):
+                if tabuleiro[i][j].estado == jogadorAtual:
+                    contadorAtual += 1
      
-      for i in range(8):
-	for j in range(8):
-	  if tabuleiro[i][j].estado == jogadorAtual:
-	    contadorAtual += 1
-     
-      captura = contadorAtual - contador
-      
-      captura / float(contadorAtual) * 100
-		  
-      return captura
-	  
-	  
-	  
+        captura = contadorAtual - contador
+        
+        captura / float(contadorAtual) * 100
+        
+        return captura
+
 
     def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 
         todosVirar = []
         virar = []
         jogadaValida = 0
+        
         # PERCORRENDO COLUNAS
         for a in range(7 - i): # Para direita
             col = i + a + 1
@@ -198,10 +196,9 @@ class Captura:
                 for t0 in t:
                     col,lin = t0
                     self.novoTab[col][lin] = 1
-                    
-       
-                
+            
         return jogadaValida
+        
 
     def verificaJogada(self, peca, a, jogadorAtual): # 1:jogadaValida, 0:continua, 2:para
         if peca.estado == 0:
