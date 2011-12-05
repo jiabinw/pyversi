@@ -12,18 +12,16 @@ class NivelMedio:
     
     # Calcula as heuristicas para o nivel facil, com peso para cada uma
     def calcula(self, tabuleiro, jogadorAtual):
-        faseJogo = PesoPosicao().estadoJogo(tabuleiro) # Retorna quantos porcento de jogo já aconteceu.        
+        pesoPosicao = pesoCaptura = pesoMobilidade = pesoNrPecas = valorPosicao = valorCaptura = valorMobilidade = valorNrPecas = 0
         
-        valorPosicao = valorCaptura = valorMobilidade = valorNrPecas = 0
-        
-        # Posicao
-        pesoPosicao = 1 
-        # Mobilidade
-        pesoMobilidade = 1
-        # Captura 
-        pesoCaptura = 1
-        # Numero de Pecas
-        pesoNrPecas = 1
+        faseJogo = FaseDoJogo().estadoJogo(tabuleiro) # Retorna quantos porcento de jogo ja aconteceu.        
+        if faseJogo < 70:
+            pesoPosicao = 3 
+            pesoCaptura = 1
+        else:
+            pesoPosicao = 1 
+            pesoCaptura = 1
+            pesoNrPecas = 2
         
         if(pesoPosicao > 0):
             valorPosicao = PesoPosicao().calcula(tabuleiro, jogadorAtual)

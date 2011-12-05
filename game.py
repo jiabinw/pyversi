@@ -108,9 +108,9 @@ class Game:
             im = gui.Image("img/titulo.png")
             c.add(im, 0, 0)
             im = gui.Image("img/fundo.png")
-            c.add(im, 0, 218)
+            c.add(im, 0, 213)
             im = gui.Image("img/fundo.png")
-            c.add(im, 0, 366)
+            c.add(im, 0, 361)
         
         if self.estadoJogo == 0: # Tela inicial          
             form = gui.Table()      
@@ -161,14 +161,23 @@ class Game:
             form = gui.Table()
             form.tr()
             if self.estadoJogo == 1: # Contra somente 1 jogador humano
-                form.td(gui.Label("Computador", color=(0, 0, 0)), width=128)
-                c.add(form, 95, 120)
+                form.td(gui.Label("Computador", color=(0, 0, 0)), width=100)
+                c.add(form, 90, 120)
+                
+                pg = gui.Image("img/pecapreta.png", width=27, height=27)
+                c.add(pg, 195, 120)
                 
                 self.heuristica1 = self.listaHeuristicas()
                 c.add(self.heuristica1, 95, 150)
             else: # Nenhuma jogador humano
-                form.td(gui.Label("Jogador 1", color=(0, 0, 0)), width=128)
-                form.td(gui.Label("Jogador 2", color=(0, 0, 0)), width=240)
+                form.td(gui.Label("Jogador", color=(0, 0, 0)), width=100)
+                form.td(gui.Label("Jogador", color=(0, 0, 0)), width=280)
+                pg = gui.Image("img/pecavermelha.png", width=27, height=27)
+                c.add(pg, 92, 120)
+                
+                pg = gui.Image("img/pecapreta.png", width=27, height=27)
+                c.add(pg, 280, 120)
+                
                 c.add(form, 5, 120)
                 
                 self.heuristica1 = self.listaHeuristicas()
@@ -181,9 +190,9 @@ class Game:
 
     def listaHeuristicas(self): # Lista de Heuristicas do jogo
         heuristicas = gui.List(width=125, height=155)
-        heuristicas.add("Expert", value=4)
+        heuristicas.add("Easy", value=4)
         heuristicas.add("Normal", value=5)
-        heuristicas.add("Easy", value=6)
+        heuristicas.add("Expert", value=6)
         heuristicas.add("----------", value=10)
         heuristicas.add("Numero Peca", value=0)
         heuristicas.add("Mobilidade", value=1)
