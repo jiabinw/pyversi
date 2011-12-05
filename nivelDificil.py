@@ -17,16 +17,18 @@ class NivelDificil:
         pesoPosicao = pesoCaptura = pesoMobilidade = pesoNrPecas = valorPosicao = valorCaptura = valorMobilidade = valorNrPecas = 0
         
         if faseJogo < 40:
-            pesoPosicao = 1
-            pesoCaptura = 1
+            pesoPosicao = 1.5
+            pesoCaptura = 2
             pesoMobilidade = 2
-        elif faseJogo >= 40 and faseJogo < 80:
+        elif faseJogo >= 40 and faseJogo < 90:
             pesoPosicao = 2
-            pesoCaptura = 1
+            pesoCaptura = 1.5
             pesoMobilidade = 1
-            pesoNrPecas = 0.5
-        else: # TODO fazer forca-bruta em cima do numero de pecas. A partir do nivel maximo que o alpha beta prunning eh aconselhavel
             pesoNrPecas = 1
+        else: # TODO fazer forca-bruta em cima do numero de pecas. A partir do nivel maximo que o alpha beta prunning eh aconselhavel
+            pesoPosicao = 1.5
+            pesoNrPecas = 4
+            pesoCaptura = 2.5
         
         if(pesoPosicao > 0):
             valorPosicao = PesoPosicao().calcula(tabuleiro, jogadorAtual)
