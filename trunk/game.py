@@ -164,19 +164,19 @@ class Game:
                 form.td(gui.Label("Computador", color=(0, 0, 0)), width=100)
                 c.add(form, 90, 120)
                 
-                pg = gui.Image("img/pecapreta.png", width=27, height=27)
-                c.add(pg, 195, 120)
+                pg = gui.Image("img/pecapreta.png")
+                c.add(pg, 195, 112)
                 
                 self.heuristica1 = self.listaHeuristicas()
                 c.add(self.heuristica1, 95, 150)
             else: # Nenhuma jogador humano
                 form.td(gui.Label("Jogador", color=(0, 0, 0)), width=100)
                 form.td(gui.Label("Jogador", color=(0, 0, 0)), width=280)
-                pg = gui.Image("img/pecavermelha.png", width=27, height=27)
-                c.add(pg, 92, 120)
+                pg = gui.Image("img/pecavermelha.png")
+                c.add(pg, 92, 112)
                 
-                pg = gui.Image("img/pecapreta.png", width=27, height=27)
-                c.add(pg, 280, 120)
+                pg = gui.Image("img/pecapreta.png")
+                c.add(pg, 280, 112)
                 
                 c.add(form, 5, 120)
                 

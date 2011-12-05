@@ -33,14 +33,14 @@ class Tabuleiro:
         self.font = pygame.font.SysFont("Courier New", 18)
         self.pygame = game       
         self.ImgSurface = self.pygame.image.load(self.IMGPATH)
-        row = [0]*8
+        row = [0] * 8
         
         for item in row:
             self.tabuleiro.append(copy.deepcopy(row))
             
         self.initPecas()
         
-        print ai1, ai2
+        #print ai1, ai2
         self.heuristicas = []
         
         if ai1 != -1:
@@ -78,9 +78,8 @@ class Tabuleiro:
         else:
             self.human = 1
             
-        
+
     def refresh(self):
-        
         if not self.human and not self.fim:
             self.tabuleiro = self.minimax(self.tabuleiro,3, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
             self.alternador()
@@ -92,8 +91,8 @@ class Tabuleiro:
 
         #proximo jogador
         peca = Peca()
-        proximo = self.font.render(" Proximo ",1,(0,0,0))
-        screen.blit(proximo,(25,30))
+        proximo = self.font.render(" Proximo ", 1, (0, 0, 0))
+        screen.blit(proximo,(25, 30))
         if self.last == 2:
                 self.tempoVermelho = self.tempoVermelho + self.tempoAdicionar
                 peca.estado = 1
@@ -103,32 +102,31 @@ class Tabuleiro:
         screen.blit(peca.img(), (0, 25))
         
         #escreve a pontuacao na tela
-        ren = self.font.render(" Pontuacao",1,(0,0,0))
-        screen.blit(ren,(120,0))
+        ren = self.font.render(" Pontuacao", 1, (0, 0, 0))
+        screen.blit(ren, (120, 0))
 
         #peca vermelha
         peca.estado = 1 
-        pontVerm = self.font.render(":" + str(self.pontosVermelho),1,(255,0,0))
-        screen.blit(pontVerm,(150,30))
+        pontVerm = self.font.render(":" + str(self.pontosVermelho), 1, (255, 0, 0))
+        screen.blit(pontVerm,(150, 30))
         screen.blit(peca.img(), (120, 20))
 
         #peca preta
         peca.estado = 2
-        pontPreto = self.font.render(":" + str(self.pontosPreto),1,(0,0,0))
+        pontPreto = self.font.render(":" + str(self.pontosPreto), 1, (0, 0, 0))
         screen.blit(pontPreto,(215, 30))
         screen.blit(peca.img(), (185, 20))
 
         #cronometro
-        cron = self.font.render(" Tempo",1,(0,0,0))
+        cron = self.font.render(" Tempo", 1, (0, 0, 0))
         screen.blit(cron,(250,0))
-        segundos = int(round(self.tempo/1000))
-        minutos = int(round(segundos/60))
+        segundos = int(round(self.tempo / 1000))
+        minutos = int(round(segundos / 60))
         segundos = int(round(segundos % 60))
         
         cronometro = ('%02d:%02d' % (minutos, segundos))
         tempoTela = self.font.render(str(cronometro), 1, (0,0,0))
         screen.blit(tempoTela, (260, 30))
-
 
         for i in range(8):
             for j in range(8):
@@ -175,7 +173,7 @@ class Tabuleiro:
                 return 0
             
             #Se chegou aqui significa que o jogador atual nao tem mais jogadas validas                        
-            #print " Passou a vez "
+            print " Passou a vez "
             if jogadorAtual == 1:
                 player = 2
             else:
@@ -201,6 +199,7 @@ class Tabuleiro:
                 print " Empate "
             return 1
         return 0
+        
                 
     def initPecas(self):
         for i in range(8):
@@ -216,7 +215,6 @@ class Tabuleiro:
         
     
     def click(self, x, y):
-
         if x < self.offset[0] or x > self.size[0] + self.offset[0]:
             return
         if y < self.offset[1] or y > self.size[1] + self.offset[1]:
@@ -231,19 +229,18 @@ class Tabuleiro:
             peca.estado = self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
+            
             if self.ai and self.human and not self.fim:
                 self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
                 self.alternador()
                 self.fim = self.fimJogo(self.tabuleiro, self.atual)
                 self.pontuacao()
 
-        
-        
-
     def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 
         todosVirar = []
         virar = []
         jogadaValida = 0
+        
         # PERCORRENDO COLUNAS
         for a in range(7 - i): # Para direita
             col = i + a + 1
@@ -382,7 +379,6 @@ class Tabuleiro:
             if (not(verifica)):
                 virar.append(peca)
 
-
         # Se a jogada for valida, da o flip nas pecas para a cor do jogador corrente
         if ((jogadaValida == 1) and (not(verifica))):
             for t in todosVirar:
@@ -392,6 +388,7 @@ class Tabuleiro:
             #print "Erro: Jogada Invalida"           
                 
         return jogadaValida
+
 
     def verificaJogada(self, peca, a, jogadorAtual): # 1:jogadaValida, 0:continua, 2:para
         if peca.estado == 0:
@@ -405,6 +402,7 @@ class Tabuleiro:
                 return 2
 
         return 0
+
 
     def pontuacao(self):
         self.pontosVermelho = 0
@@ -433,12 +431,12 @@ class Tabuleiro:
     def proximaJogada(self, tabuleiro, mapeamento, jogadorAtual):
         ultimaLinha = mapeamento[8][0]
         ultimaColuna = mapeamento[8][1]
+        
         oponente = 0
         if(jogadorAtual == 1):
             oponente = 2
         else:
-            oponente = 1
-        
+            oponente = 1      
          
         # Procuro por uma peca do jogador adversario (oponente)
         if not tabuleiro[ultimaLinha][ultimaColuna].estado == oponente:
@@ -480,6 +478,7 @@ class Tabuleiro:
                 (ultimaLinha, ultimaColuna) = self.proxPeca(ultimaLinha, ultimaColuna, tabuleiro, oponente)
         return (-1,-1)
 
+
     # Funcao que cria a arvore do alfa-beta prunning
     # tabuleiroMiniMax = Copia do tabuleiro
     # profundidade = profundidade maxima que a arvore ira atingir
@@ -488,10 +487,7 @@ class Tabuleiro:
     # jogadorAtual = 1 se vermelho; 2 se preto
     # heuristica = heuristica que sera usada 
     # Retorna tupla: (valor da funcao de avaliacao, tabuleiro)
-    
     def minimax(self, tabuleiroMiniMax, profundidade, donoNivel, primeiraChamada, jogadorAtual, heuristica, alpha, beta):
-
-
         #descobre o proximo jogador
         if (jogadorAtual == 1):
             proximoJogador = 2
@@ -504,11 +500,10 @@ class Tabuleiro:
                 return (heuristica.calcula(tabuleiroMiniMax, jogadorAtual), tabuleiroMiniMax)
             else:
                 return (heuristica.calcula(tabuleiroMiniMax, proximoJogador), tabuleiroMiniMax)
-        
-        
+               
         #heuristica de mapeamento para melhorar a performance da busca de jogadas validas
         mapeamento = []
-        row = [0]*8        
+        row = [0] * 8        
         for item in row:
             mapeamento.append(copy.deepcopy(row))
         mapeamento.append([0,0])
@@ -517,6 +512,7 @@ class Tabuleiro:
         minimo = [float("inf"), None]
         novoTab = copy.deepcopy(tabuleiroMiniMax)
         jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
+        
         while (jogadaAtual != (-1,-1)):
             # Verifico se a posicao retornada por proxima jogada eh uma jogada valida)
             if(self.jogadaValida(jogadaAtual[0],jogadaAtual[1], novoTab, 0, jogadorAtual)):
@@ -550,11 +546,9 @@ class Tabuleiro:
                 novoTab = copy.deepcopy(tabuleiroMiniMax)                               
             jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
         
-        
         # Nenhuma jogada para o jogador atual, passo a vez
         if (donoNivel and maximo[1] == None) or ((not donoNivel) and minimo[1] == None):
             return self.minimax(tabuleiroMiniMax, profundidade - 1, not(donoNivel), 0, proximoJogador, heuristica, alpha, beta)
-        
         
         if (donoNivel):
             return (maximo[0],maximo[1])
@@ -564,7 +558,8 @@ class Tabuleiro:
         
     def map(self, x, i):
         return int(round((x-self.offset[i])/41,0))
-        
+
+
     def alternador(self):
         if self.last == 1:
             self.last = 2
