@@ -9,22 +9,25 @@ class PesoPosicao: #Calcula quantos de pontos o jogadorAtual tem para estes peso
     def calcula(self, tabuleiro, jogadorAtual):    
     
         pesoPosicao = (
-                        (120, -20, 20,  5,  5, 20,-20,120),
-                        (-20, -40, -5, -5, -5, -5,-40,-20),
-                        ( 20,  -5, 15,  3,  3, 15, -5, 20),
-                        (  5,  -5,  3,  3,  3,  3, -5,  5),
-                        (  5,  -5,  3,  3,  3,  3, -5,  5),
-                        ( 20,  -5, 15,  3,  3, 15, -5, 20),
-                        (-20, -40, -5, -5, -5, -5,-40,-20),
-                        (120, -20, 20,  5,  5, 20,-20,120)
+                        (120, -40, 20, 10, 10, 20, -40,120),
+                        (-40,-120, 10,-10,-10, 10,-120,-40),
+                        ( 20,  10, 15,  3,  3, 15,  10, 20),
+                        ( 10, -10,  3,  3,  3,  3, -10, 10),
+                        ( 10, -10,  3,  3,  3,  3, -10, 10),
+                        ( 20,  10, 15,  3,  3, 15,  10, 20),
+                        (-40,-120, 10,-10,-10, 10,-120,-40),
+                        (120, -40, 20, 10, 10, 20, -40,120)
                       )
         maxAvaliacao = avaliacao = 0
         for i in range(8):
             for j in range(8):
                 maxAvaliacao += pesoPosicao[i][j]
+                #print "i", i, "j", j, " peso", pesoPosicao[i][j]
                 if jogadorAtual == tabuleiro[i][j].estado:
                     avaliacao += pesoPosicao[i][j]
 
-        normalizado = (avaliacao / float(maxAvaliacao)) * 100
+        normalizado = (avaliacao / float(64)) * 100
+        
+        #print "normalizado", normalizado
         
         return normalizado

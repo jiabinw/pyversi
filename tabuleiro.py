@@ -37,8 +37,6 @@ class Tabuleiro:
         
         for item in row:
             self.tabuleiro.append(copy.deepcopy(row))
-            
-        self.initPecas()
         
         #print ai1, ai2
         self.heuristicas = []
@@ -78,10 +76,12 @@ class Tabuleiro:
         else:
             self.human = 1
             
+        self.initPecas()
+            
 
     def refresh(self):
         if not self.human and not self.fim:
-            self.tabuleiro = self.minimax(self.tabuleiro,3, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
+            self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
             self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
@@ -210,7 +210,11 @@ class Tabuleiro:
 
         for peca in pecas:
             peca.estado = self.alternador()
-
+        self.alternador()
+        
+        self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+        self.alternador()
+        self.fim = self.fimJogo(self.tabuleiro, self.atual)
         self.pontuacao()
         
     
@@ -226,14 +230,33 @@ class Tabuleiro:
         peca = self.tabuleiro[mapX][mapY]
 
         if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
-            peca.estado = self.alternador()
-            self.fim = self.fimJogo(self.tabuleiro, self.atual)
+            print "jogou0", self.atual
+            peca.estado = self.alternador() 
+            print "jogou1", self.atual
+            self.fim = self.fimJogo(self.tabuleiro, self.atual) 
+            print "jogou2", self.atual
             self.pontuacao()
             
             if self.ai and self.human and not self.fim:
-                self.tabuleiro = self.minimax(self.tabuleiro, 3, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
-                self.alternador()
+                print "jogou3", self.atual
+                while True:
+                    if not self.isPassaVez(self.tabuleiro, self.atual):
+                        self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                    print "jogou4", self.atual
+                    self.alternador()
+                    print "jogou5", self.atual
+                    
+                    if self.isPassaVez(self.tabuleiro, self.atual) == 0 or self.isFimJogo(self.tabuleiro, 0, self.atual):
+                        print "jogou5.5", self.atual
+                        break
+                    print "jogou6", self.atual
+                    
+                    self.fim = self.fimJogo(self.tabuleiro, self.atual)
+                    print "jogou7", self.atual
+                    self.pontuacao() 
+                print "jogou8", self.atual
                 self.fim = self.fimJogo(self.tabuleiro, self.atual)
+                print "jogou9", self.atual
                 self.pontuacao()
 
     def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 

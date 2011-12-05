@@ -41,7 +41,8 @@ class Captura:
      
         captura = contadorAtual - contador
         
-        captura / float(contadorAtual) * 100
+        if contadorAtual > 0:
+            captura = captura / float(64) * 100
         
         return captura
 
