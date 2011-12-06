@@ -7,18 +7,19 @@ class Captura: # Verifica quantas pecas posso perder naquela jogada menos quanto
     novoTab = []
       
     def calcula(self, tabuleiro, jogadorAtual):
+        # CALCULANDO JOGADOR INVERSO E CRIANDO MATRIZ AUXILIAR
         if jogadorAtual == 1:
             jogadorProx = 2
         else:
             jogadorProx = 1
-        
         if len(self.novoTab) == 0: #inicializa
             self.novoTab = [[0] * 8 for i in range(8)]
-        else:  #somente atualiza
+        else:  # SOMENTE LIMPA
             for i in range(8):
                 for j in range(8):            
                     self.novoTab[i][j] = 0
 
+        # CALCULANDO HEURISTICA PARA ADVERSARIO
         contador = contadorAtual = 0
         for i in range(8):
             for j in range(8):
@@ -33,14 +34,13 @@ class Captura: # Verifica quantas pecas posso perder naquela jogada menos quanto
                 if tabuleiro[i][j].estado == jogadorAtual:
                     contadorAtual += 1
         captura = contadorAtual - contador
-         
-        if len(self.novoTab) == 0: #inicializa
-            self.novoTab = [[0] * 8 for i in range(8)]
-        else:  #somente atualiza
-            for i in range(8):
-                for j in range(8):            
-                    self.novoTab[i][j] = 0
-
+        
+        # LIMPA MATRIZ
+        for i in range(8):
+            for j in range(8):            
+                self.novoTab[i][j] = 0
+        
+        # CALCULANDO HEURISTICA PARA JOGADOR ATUAL
         contador = contadorAtual = 0
         for i in range(8):
             for j in range(8):
