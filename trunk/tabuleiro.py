@@ -86,23 +86,24 @@ class Tabuleiro:
             
 
     def refresh(self):	
-	colorFlag = self.last
-	if self.atual == 1:
-	  self.elapsedTimeRed = time.time()	  	  
-	else:
-	  self.elapsedTimeBlack = time.time()
-        if not self.human and not self.fim:		    
+        colorFlag = self.last
+        if self.atual == 1:
+          self.elapsedTimeRed = time.time()               
+        else:
+          self.elapsedTimeBlack = time.time()
+          
+        if not self.human and not self.fim:                 
             self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
             self.alternador()
-            self.fim = self.fimJogo(self.tabuleiro, self.atual)
+            self.fim = self.fimJogo(self.tabuleiro, 1, self.atual)
             self.pontuacao()
         
-	if self.atual != colorFlag:	  
-	  if self.atual == 1:
-	    self.elapsedTimeBlack = time.time()
-	  else:
-	    self.elapsedTimeRed = time.time()
-	    
+        if self.atual != colorFlag:       
+          if self.atual == 1:
+            self.elapsedTimeBlack = time.time()
+          else:
+            self.elapsedTimeRed = time.time()
+            
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
 
@@ -111,14 +112,14 @@ class Tabuleiro:
         proximo = self.font.render(" Proximo ", 1, (0, 0, 0))
         screen.blit(proximo,(25, 30))
         if self.last == 2:
-	  	self.end_time = time.time()		
-		self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack		
-		self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto     		
+                self.end_time = time.time()             
+                self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack           
+                self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto               
                 peca.estado = 2 
         elif self.last == 1:
-		self.end_time = time.time()
-		self.elapsedTimeRed = self.end_time - self.elapsedTimeRed	   		
-		self.tempoVermelho = self.elapsedTimeRed + self.tempoVermelho			
+                self.end_time = time.time()
+                self.elapsedTimeRed = self.end_time - self.elapsedTimeRed                       
+                self.tempoVermelho = self.elapsedTimeRed + self.tempoVermelho                   
                 peca.estado = 1
 
         screen.blit(peca.img(), (0, 25))
@@ -147,12 +148,12 @@ class Tabuleiro:
         #segundos = int(round(segundos % 60))
               
         
-	self.end_time = time.time()
-	
-	cronometro = self.end_time - self.start_time
-	cronometro = ('%02d s' % (cronometro))
-	
-	#print cronometro
+        self.end_time = time.time()
+        
+        cronometro = self.end_time - self.start_time
+        cronometro = ('%02d s' % (cronometro))
+        
+        #print cronometro
         tempoTela = self.font.render(str(cronometro), 1, (0,0,0))
         screen.blit(tempoTela, (260, 30))
 
@@ -201,7 +202,7 @@ class Tabuleiro:
                 return 0
             
             #Se chegou aqui significa que o jogador atual nao tem mais jogadas validas                        
-            print " Passou a vez "
+            print " Passou a vez ", jogadorAtual
             if jogadorAtual == 1:
                 player = 2
             else:
@@ -215,8 +216,8 @@ class Tabuleiro:
             return 1
         
         
-    def fimJogo(self, tabuleiroFimJogo, jogadorAtual):        
-        if (self.isFimJogo(tabuleiroFimJogo, 1, jogadorAtual)):
+    def fimJogo(self, tabuleiroFimJogo, alterna,  jogadorAtual):        
+        if (self.isFimJogo(tabuleiroFimJogo, alterna, jogadorAtual)):
             print " Fim do Jogo "            
             self.pontuacao()
             if self.pontosVermelho > self.pontosPreto:
@@ -226,7 +227,7 @@ class Tabuleiro:
             else:
                 print " Empate "
             print "Red Time", self.tempoVermelho
-	    print "Black Time", self.tempoPreto
+            print "Black Time", self.tempoPreto
             return 1
         return 0
         
@@ -240,12 +241,12 @@ class Tabuleiro:
 
         for peca in pecas:
             peca.estado = self.alternador()
-        self.alternador()
-        
-        self.tabuleiro = self.minimax(self.tabuleiro, 7, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
-        self.alternador()
-        self.fim = self.fimJogo(self.tabuleiro, self.atual)
-        self.pontuacao()
+        #self.alternador()
+        #
+        #self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+        #self.alternador()
+        #self.fim = self.fimJogo(self.tabuleiro, self.atual)
+        #self.pontuacao()
         
     
     def click(self, x, y):
@@ -260,34 +261,36 @@ class Tabuleiro:
         peca = self.tabuleiro[mapX][mapY]
 
         if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
-            print "jogou0", self.atual
             peca.estado = self.alternador() 
-            print "jogou1", self.atual
-            self.fim = self.fimJogo(self.tabuleiro, self.atual) 
-            print "jogou2", self.atual
+            self.fim = self.fimJogo(self.tabuleiro, 1, self.atual) 
             self.pontuacao()
             
-            if self.ai and self.human and not self.fim:
-                while True:	
-		    print "jogou3", self.atual		  
-                    if not self.isPassaVez(self.tabuleiro, self.atual):
-                        self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
-                    print "jogou4", self.atual
-                    self.alternador()
-                    print "jogou5", self.atual
-                    
-                    if self.isPassaVez(self.tabuleiro, self.atual) == 0 or self.isFimJogo(self.tabuleiro, 0, self.atual):
-                        print "jogou5.5", self.atual
-                        break
-                    print "jogou6", self.atual
-                    
-                    self.fim = self.fimJogo(self.tabuleiro, self.atual)
-                    print "jogou7", self.atual
-                    self.pontuacao() 
-                print "jogou8", self.atual
-                self.fim = self.fimJogo(self.tabuleiro, self.atual)
-                print "jogou9", self.atual
+            if self.ai and self.human and not self.fim and not peca.estado == self.atual:
+                self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
                 self.pontuacao()
+                self.alternador()
+                self.fim = self.fimJogo(self.tabuleiro, 0, self.atual)
+                while self.isPassaVez(self.tabuleiro, self.atual) and not self.fim:
+                    self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.last, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                    self.pontuacao()
+                    self.fim = self.fimJogo(self.tabuleiro, 0, self.last)
+
+                #while True:
+                #    print 'iterou'
+                #    if not self.isPassaVez(self.tabuleiro, self.atual):
+                #        self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                #   
+                #    self.alternador()
+                #    
+                #    
+                #    if self.isPassaVez(self.tabuleiro, self.atual) == 0 or self.isFimJogo(self.tabuleiro, 0, self.atual):
+                #        break
+                #    
+                #    
+                #    self.fim = self.fimJogo(self.tabuleiro, self.atual)
+                #    self.pontuacao()
+                
+                
 
     def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 
         todosVirar = []
@@ -547,12 +550,18 @@ class Tabuleiro:
         elif (jogadorAtual == 2):
             proximoJogador = 1
         
+        
+        if primeiraChamada:
+            thisTab = tabuleiroMiniMax
+        else:
+            thisTab = None
+        
         # Caso base, ja iterou em toda a profundidade, ou jogo acabou
         if ((profundidade == 0) or (self.isFimJogo(tabuleiroMiniMax, 0, jogadorAtual))):
             if donoNivel:
-                return (heuristica.calcula(tabuleiroMiniMax, jogadorAtual), tabuleiroMiniMax)
+                return (heuristica.calcula(tabuleiroMiniMax, jogadorAtual), thisTab)
             else:
-                return (heuristica.calcula(tabuleiroMiniMax, proximoJogador), tabuleiroMiniMax)
+                return (heuristica.calcula(tabuleiroMiniMax, proximoJogador), thisTab)
                
         #heuristica de mapeamento para melhorar a performance da busca de jogadas validas
         mapeamento = []
@@ -576,9 +585,9 @@ class Tabuleiro:
                     if atual[0] > maximo[0]:
                         maximo[0] = atual[0]
                         if primeiraChamada:
-                            maximo[1] = atual[1]
+                            maximo[1] = novoTab
                         else:
-                            maximo[1] = tabuleiroMiniMax
+                            maximo[1] = None
                     if atual[0] > alpha:
                         alpha = atual[0]        
                     if alpha >= beta:
@@ -587,9 +596,9 @@ class Tabuleiro:
                     if atual[0] < minimo[0]:
                         minimo[0] = atual[0]
                         if primeiraChamada:
-                            minimo[1] = atual[1]
+                            minimo[1] = novoTab
                         else:
-                            minimo[1] = tabuleiroMiniMax
+                            minimo[1] = None
                     if atual[0] < beta:
                         beta = atual[0]
                     if alpha >= beta:
@@ -600,7 +609,7 @@ class Tabuleiro:
             jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
         
         # Nenhuma jogada para o jogador atual, passo a vez
-        if (donoNivel and maximo[1] == None) or ((not donoNivel) and minimo[1] == None):
+        if (donoNivel and maximo[0] == float("-inf")) or ((not donoNivel) and minimo[0] == float("inf")):
             return self.minimax(tabuleiroMiniMax, profundidade - 1, not(donoNivel), 0, proximoJogador, heuristica, alpha, beta)
         
         if (donoNivel):
