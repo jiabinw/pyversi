@@ -100,8 +100,9 @@ class Tabuleiro:
         return tabCopied
 
     def refresh(self):	
-        colorFlag = self.atual
-        #print "color1", self.atual
+        colorFlag = self.last
+     #   print "color1", 
+      #  print "color2", self.last
         if self.atual == 1:
           self.elapsedTimeRed = time.time()               
         else:
@@ -113,9 +114,11 @@ class Tabuleiro:
             self.fim = self.fimJogo(self.tabuleiro, 1, self.atual)
             self.pontuacao()
         
-        
-        if self.atual != colorFlag:       
-          if self.atual == 2:	   
+        if self.elapsedTimeBlack == 0:
+	  self.elapsedTimeBlack = time.time()
+	  
+        if self.atual != colorFlag:   
+          if colorFlag == 2:	   
             self.elapsedTimeBlack = time.time()
           else:	 
             self.elapsedTimeRed = time.time()
@@ -130,7 +133,8 @@ class Tabuleiro:
         if self.atual == 2:
                 self.end_time = time.time()                           
                 self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack               
-                self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto               
+                self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto     
+              #  print "tempP", self.tempoPreto
                 peca.estado = 2 
         elif self.atual == 1:
                 self.end_time = time.time()
