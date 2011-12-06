@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os, sys, copy
+import time
 from peca import *
 from numeroPeca import *
 from mobilidade import *
@@ -28,12 +29,16 @@ class Tabuleiro:
     human = 0
     fim = 0
     heuristicas = []
+    start_time = 0
+    end_time = 0
+    elapsedTimeRed = 0
+    elapsedTimeBlack = 0
     
     def __init__(self, game, ai1 = -1, ai2 = -1):
         self.font = pygame.font.SysFont("Courier New", 18)
         self.pygame = game       
         self.ImgSurface = self.pygame.image.load(self.IMGPATH)
-        row = [0] * 8
+        row = [0] * 8        
         
         for item in row:
             self.tabuleiro.append(copy.deepcopy(row))
@@ -76,16 +81,28 @@ class Tabuleiro:
         else:
             self.human = 1
             
+        self.start_time = time.time()
         self.initPecas()
             
 
-    def refresh(self):
-        if not self.human and not self.fim:
+    def refresh(self):	
+	colorFlag = self.last
+	if self.atual == 1:
+	  self.elapsedTimeRed = time.time()	  	  
+	else:
+	  self.elapsedTimeBlack = time.time()
+        if not self.human and not self.fim:		    
             self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
             self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, self.atual)
             self.pontuacao()
         
+	if self.atual != colorFlag:	  
+	  if self.atual == 1:
+	    self.elapsedTimeBlack = time.time()
+	  else:
+	    self.elapsedTimeRed = time.time()
+	    
         screen = self.pygame.display.get_surface()        
         screen.blit(self.ImgSurface, self.offset)
 
@@ -94,11 +111,16 @@ class Tabuleiro:
         proximo = self.font.render(" Proximo ", 1, (0, 0, 0))
         screen.blit(proximo,(25, 30))
         if self.last == 2:
-                self.tempoVermelho = self.tempoVermelho + self.tempoAdicionar
-                peca.estado = 1
-        elif self.last == 1:
-                self.tempoPreto = self.tempoPreto + self.tempoAdicionar
+	  	self.end_time = time.time()		
+		self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack		
+		self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto     		
                 peca.estado = 2 
+        elif self.last == 1:
+		self.end_time = time.time()
+		self.elapsedTimeRed = self.end_time - self.elapsedTimeRed	   		
+		self.tempoVermelho = self.elapsedTimeRed + self.tempoVermelho			
+                peca.estado = 1
+
         screen.blit(peca.img(), (0, 25))
         
         #escreve a pontuacao na tela
@@ -120,11 +142,17 @@ class Tabuleiro:
         #cronometro
         cron = self.font.render(" Tempo", 1, (0, 0, 0))
         screen.blit(cron,(250,0))
-        segundos = int(round(self.tempo / 1000))
-        minutos = int(round(segundos / 60))
-        segundos = int(round(segundos % 60))
+        #segundos = int(round(self.tempo / 1000))
+        #minutos = int(round(segundos / 60))
+        #segundos = int(round(segundos % 60))
+              
         
-        cronometro = ('%02d:%02d' % (minutos, segundos))
+	self.end_time = time.time()
+	
+	cronometro = self.end_time - self.start_time
+	cronometro = ('%02d s' % (cronometro))
+	
+	#print cronometro
         tempoTela = self.font.render(str(cronometro), 1, (0,0,0))
         screen.blit(tempoTela, (260, 30))
 
@@ -197,6 +225,8 @@ class Tabuleiro:
                 print " Preto ganhou "
             else:
                 print " Empate "
+            print "Red Time", self.tempoVermelho
+	    print "Black Time", self.tempoPreto
             return 1
         return 0
         
@@ -212,7 +242,7 @@ class Tabuleiro:
             peca.estado = self.alternador()
         self.alternador()
         
-        self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+        self.tabuleiro = self.minimax(self.tabuleiro, 7, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
         self.alternador()
         self.fim = self.fimJogo(self.tabuleiro, self.atual)
         self.pontuacao()
@@ -238,8 +268,8 @@ class Tabuleiro:
             self.pontuacao()
             
             if self.ai and self.human and not self.fim:
-                print "jogou3", self.atual
-                while True:
+                while True:	
+		    print "jogou3", self.atual		  
                     if not self.isPassaVez(self.tabuleiro, self.atual):
                         self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
                     print "jogou4", self.atual
@@ -587,9 +617,9 @@ class Tabuleiro:
         if self.last == 1:
             self.last = 2
             self.atual = 1
-            self.tempo = self.tempoVermelho
+           # self.tempo = self.tempoVermelho
         else:
             self.last = 1
             self.atual = 2
-            self.tempo = self.tempoPreto
+            #self.tempo = self.tempoPreto
         return self.last
