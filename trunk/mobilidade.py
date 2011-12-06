@@ -28,7 +28,6 @@ class Mobilidade: # Calcula quanto de Mobilidade o meu adversario tem. Quanto ma
         for i in range(8):
             for j in range(8):
                 if tabuleiro[i][j].estado == 0:
-                    #novoTab = copy.deepcopy(tabuleiro)
                     if self.jogadaValida(i, j, tabuleiro, jogador, 0):
                         avaliacao += pesoPosicao[i][j]
         
@@ -36,7 +35,6 @@ class Mobilidade: # Calcula quanto de Mobilidade o meu adversario tem. Quanto ma
         for i in range(8):
             for j in range(8):
                 if tabuleiro[i][j].estado == 0:
-                    #novoTab = copy.deepcopy(tabuleiro)
                     if self.jogadaValida(i, j, tabuleiro, jogadorAtual, 0):
                         avaliacao += pesoPosicao[i][j]
         

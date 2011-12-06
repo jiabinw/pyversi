@@ -45,7 +45,6 @@ class Tabuleiro:
         
         self.tabuleiro = [[0] * 8 for i in range(8)]
         
-        #print ai1, ai2
         self.heuristicas = []
         self.aiVerm = ai1
         self.aiPreto = ai2
@@ -131,14 +130,13 @@ class Tabuleiro:
         proximo = self.font.render(" Proximo ", 1, (0, 0, 0))
         screen.blit(proximo,(25, 30))
         if self.atual == 2:
-                self.end_time = time.time()                           
-                self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack               
-                self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto     
-              #  print "tempP", self.tempoPreto
+                self.end_time = time.time()             
+                self.elapsedTimeBlack = (self.end_time - self.elapsedTimeBlack)/2
+                self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto               
                 peca.estado = 2 
         elif self.atual == 1:
                 self.end_time = time.time()
-                self.elapsedTimeRed = self.end_time - self.elapsedTimeRed  
+                self.elapsedTimeRed = (self.end_time - self.elapsedTimeRed)/2
                 self.tempoVermelho = self.elapsedTimeRed + self.tempoVermelho                   
                 peca.estado = 1
 
@@ -162,11 +160,7 @@ class Tabuleiro:
 
         #cronometro
         cron = self.font.render(" Tempo", 1, (0, 0, 0))
-        screen.blit(cron,(250,0))
-        #segundos = int(round(self.tempo / 1000))
-        #minutos = int(round(segundos / 60))
-        #segundos = int(round(segundos % 60))
-              
+        screen.blit(cron,(250,0))              
         
         self.end_time = time.time()
         
@@ -209,7 +203,6 @@ class Tabuleiro:
             else:
                 self.jogada = [0]
             
-
         #pinta o tabuleiro
         for i in range(8):
             for j in range(8):
@@ -217,9 +210,7 @@ class Tabuleiro:
                 if item.estado != 0:
                     newsurface = item.img()
                     screen.blit(newsurface, (i*41 + 5 + self.offset[0], j*41 + 5 + self.offset[1]))
-                    
-
-            
+     
         self.tempo = self.tempo + self.tempoAdicionar
         
     def isPassaVez(self, tabuleiroFimJogo, jogadorAtual):
@@ -277,13 +268,12 @@ class Tabuleiro:
         if (self.isFimJogo(tabuleiroFimJogo, alterna, jogadorAtual)):
            # print " Fim do Jogo "            
             self.pontuacao()
-           # if self.pontosVermelho > self.pontosPreto:
-               # print " Vermelho ganhou "
-           # elif self.pontosVermelho < self.pontosPreto:
-               # print " Preto ganhou "
-          #  else:
-               # print " Empate "
-            print self.heuristicas,";", "Red Time;", self.tempoVermelho,";PontosV;",self.pontosVermelho,";PontosP;",self.pontosPreto,";Black Time;", self.tempoPreto
+            if self.pontosVermelho > self.pontosPreto:
+                print " Vermelho ganhou "
+            elif self.pontosVermelho < self.pontosPreto:
+                print " Preto ganhou "
+            else:
+                print " Empate "
             return 1
         return 0
         
@@ -298,7 +288,7 @@ class Tabuleiro:
         for peca in pecas:
             peca.estado = self.alternador()
         
-        if self.ai and self.human: # SE for IA versus PC, a IA comeca jogando com o preto
+        if self.ai and self.human: # SE for IA versus PC, a IA comeca jogando com o preto (usado para testarmos contra outras aplicacoes na web)
             self.alternador()
             self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
             self.alternador()
@@ -317,24 +307,7 @@ class Tabuleiro:
             mapY = self.map(y,1)
         
             self.jogada = [1, (mapX, mapY)]
-        
-
-                #while True:
-                #    print 'iterou'
-                #    if not self.isPassaVez(self.tabuleiro, self.atual):
-                #        self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
-                #   
-                #    self.alternador()
-                #    
-                #    
-                #    if self.isPassaVez(self.tabuleiro, self.atual) == 0 or self.isFimJogo(self.tabuleiro, 0, self.atual):
-                #        break
-                #    
-                #    
-                #    self.fim = self.fimJogo(self.tabuleiro, self.atual)
-                #    self.pontuacao()
-                
-                
+            
 
     def jogadaValida(self, i, j, tabuleiroFimJogo, verifica, jogadorAtual): #0:jogadaInvalida, 1:jogadaValida 
         todosVirar = []
@@ -483,9 +456,7 @@ class Tabuleiro:
         if ((jogadaValida == 1) and (not(verifica))):
             for t in todosVirar:
                 for t0 in t:
-                    t0.flip()
-        #elif((jogadaValida != 1) and (not(verifica))):
-            #print "Erro: Jogada Invalida"           
+                    t0.flip()           
                 
         return jogadaValida
 
@@ -666,7 +637,7 @@ class Tabuleiro:
 
 
     def alternador(self):
-        if self.aiVerm == 6 or self.aiPreto == 6:
+        if self.aiVerm == 6 or self.aiPreto == 6: # Aplica logica de variacao do nivel de aprofundamento para cada fase do jogo se a IA for a Expert
             fase = FaseDoJogo().estadoJogo(self.tabuleiro)
             
             if fase <= 10:
@@ -685,9 +656,7 @@ class Tabuleiro:
         if self.last == 1:
             self.last = 2
             self.atual = 1
-           # self.tempo = self.tempoVermelho
         else:
             self.last = 1
             self.atual = 2
-            #self.tempo = self.tempoPreto
         return self.last
