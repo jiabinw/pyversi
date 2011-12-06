@@ -16,12 +16,10 @@ class NivelMedio:
         
         faseJogo = FaseDoJogo().estadoJogo(tabuleiro) # Retorna quantos porcento de jogo ja aconteceu.        
         if faseJogo < 70:
-            pesoPosicao = 3 
-            pesoCaptura = 1
-        else:
             pesoPosicao = 1 
-            pesoCaptura = 1
-            pesoNrPecas = 2
+        else:
+            pesoNrPecas = 1
+            pesoCaptura = 0.5
         
         if(pesoPosicao > 0):
             valorPosicao = PesoPosicao().calcula(tabuleiro, jogadorAtual)

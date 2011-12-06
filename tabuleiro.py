@@ -9,6 +9,7 @@ from captura import *
 from nivelFacil import *
 from nivelMedio import *
 from nivelDificil import *
+from faseDoJogo import *
 
 class Tabuleiro:
     pygame = 0
@@ -19,6 +20,7 @@ class Tabuleiro:
     IMGPATH = os.path.join("img", "tabuleiro.png")
     pontosVermelho = 0
     pontosPreto = 0
+    nivelMinMax = 4
     last = 2
     atual = 1
     tempo = 0
@@ -40,13 +42,13 @@ class Tabuleiro:
         self.font = pygame.font.SysFont("Courier New", 18)
         self.pygame = game       
         self.ImgSurface = self.pygame.image.load(self.IMGPATH)
-        row = [0] * 8        
         
-        for item in row:
-            self.tabuleiro.append(copy.deepcopy(row))
+        self.tabuleiro = [[0] * 8 for i in range(8)]
         
         #print ai1, ai2
         self.heuristicas = []
+        self.aiVerm = ai1
+        self.aiPreto = ai2
         
         if ai1 != -1:
             self.ai = 1
@@ -85,17 +87,28 @@ class Tabuleiro:
             
         self.start_time = time.time()
         self.initPecas()
-            
+
+    def copyTab(self, tabuleiro):
+        tabCopied = [[0] * 8 for i in range(8)]
+        for r in range(8):
+            for c in range(8):
+                piece = tabuleiro[r][c]
+                if piece:
+                    tabCopied[r][c] = Peca()
+                    tabCopied[r][c].estado = piece.estado
+                    
+        return tabCopied
 
     def refresh(self):	
         colorFlag = self.last
+        
         if self.atual == 1:
           self.elapsedTimeRed = time.time()               
         else:
           self.elapsedTimeBlack = time.time()
           
-        if not self.human and not self.fim:                 
-            self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
+        if not self.human and not self.fim:     
+            self.tabuleiro = self.minimax(self.tabuleiro, self.nivelMinMax, 1, 1, self.atual, self.heuristicas[self.atual - 1], float("-inf"), float("inf"))[1]
             self.alternador()
             self.fim = self.fimJogo(self.tabuleiro, 1, self.atual)
             self.pontuacao()
@@ -115,12 +128,12 @@ class Tabuleiro:
         screen.blit(proximo,(25, 30))
         if self.atual == 2:
                 self.end_time = time.time()             
-                self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack           
+                self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack
                 self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto               
                 peca.estado = 2 
         elif self.atual == 1:
                 self.end_time = time.time()
-                self.elapsedTimeRed = self.end_time - self.elapsedTimeRed                       
+                self.elapsedTimeRed = self.end_time - self.elapsedTimeRed  
                 self.tempoVermelho = self.elapsedTimeRed + self.tempoVermelho                   
                 peca.estado = 1
 
@@ -162,12 +175,12 @@ class Tabuleiro:
         #verifica se a ia tem alguma jogada a fazer
         if not self.iaplayed:
             if self.ai and self.human and not self.fim:
-                self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                self.tabuleiro = self.minimax(self.tabuleiro, self.nivelMinMax, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
                 self.pontuacao()
                 self.alternador()
                 self.fim = self.fimJogo(self.tabuleiro, 0, self.atual)
                 while self.isPassaVez(self.tabuleiro, self.atual) and not self.fim:
-                    self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.last, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                    self.tabuleiro = self.minimax(self.tabuleiro, self.nivelMinMax, 1, 1, self.last, self.heuristicas[0], float("-inf"), float("inf"))[1]
                     self.pontuacao()
                     self.fim = self.fimJogo(self.tabuleiro, 0, self.last)
                 self.jogada = [0]
@@ -240,7 +253,8 @@ class Tabuleiro:
                 return 0
             
             #Se chegou aqui significa que o jogador atual nao tem mais jogadas validas                        
-            print " Passou a vez ", jogadorAtual
+            if alterna:
+                print " Passou a vez ", jogadorAtual
             if jogadorAtual == 1:
                 player = 2
             else:
@@ -279,14 +293,14 @@ class Tabuleiro:
 
         for peca in pecas:
             peca.estado = self.alternador()
-        #self.alternador()
-        #
-        #self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
-        #self.alternador()
-        #self.fim = self.fimJogo(self.tabuleiro, self.atual)
-        #self.pontuacao()
         
-    
+        if self.ai and self.human: # SE for IA versus PC, a IA comeca jogando com o preto
+            self.alternador()
+            self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+            self.alternador()
+            self.fim = self.fimJogo(self.tabuleiro, 0, self.atual)
+            self.pontuacao()
+        
     
     def click(self, x, y):
         if not self.jogada[0]:
@@ -591,14 +605,13 @@ class Tabuleiro:
                
         #heuristica de mapeamento para melhorar a performance da busca de jogadas validas
         mapeamento = []
-        row = [0] * 8        
-        for item in row:
-            mapeamento.append(copy.deepcopy(row))
+        mapeamento = [[0] * 8 for i in range(8)]
         mapeamento.append([0,0])
            
         maximo = [float("-inf"), None]
         minimo = [float("inf"), None]
-        novoTab = copy.deepcopy(tabuleiroMiniMax)
+        
+        novoTab = self.copyTab(tabuleiroMiniMax)
         jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
         
         while (jogadaAtual != (-1,-1)):
@@ -631,7 +644,7 @@ class Tabuleiro:
                         return (beta,minimo[1]) 
                             
                 #geramos um novo tabuleiro apenas se o atual foi modificado            
-                novoTab = copy.deepcopy(tabuleiroMiniMax)                               
+                novoTab = self.copyTab(tabuleiroMiniMax)
             jogadaAtual = self.proximaJogada(novoTab, mapeamento, jogadorAtual)
         
         # Nenhuma jogada para o jogador atual, passo a vez
@@ -649,6 +662,22 @@ class Tabuleiro:
 
 
     def alternador(self):
+        if self.aiVerm == 6 or self.aiPreto == 6:
+            fase = FaseDoJogo().estadoJogo(self.tabuleiro)
+            
+            if fase <= 10:
+                self.nivelMinMax = 4
+            elif fase <= 20:
+                self.nivelMinMax = 5
+            elif fase <= 42:
+                self.nivelMinMax = 4
+            elif fase <= 69:
+                self.nivelMinMax = 4
+            elif fase <= 84:
+                self.nivelMinMax = 5
+            else:
+                self.nivelMinMax = 7
+            
         if self.last == 1:
             self.last = 2
             self.atual = 1
