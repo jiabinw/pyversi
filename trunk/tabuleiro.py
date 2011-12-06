@@ -33,6 +33,8 @@ class Tabuleiro:
     end_time = 0
     elapsedTimeRed = 0
     elapsedTimeBlack = 0
+    jogada = [0]
+    iaplayed = 1
     
     def __init__(self, game, ai1 = -1, ai2 = -1):
         self.font = pygame.font.SysFont("Courier New", 18)
@@ -111,12 +113,12 @@ class Tabuleiro:
         peca = Peca()
         proximo = self.font.render(" Proximo ", 1, (0, 0, 0))
         screen.blit(proximo,(25, 30))
-        if self.last == 2:
+        if self.atual == 2:
                 self.end_time = time.time()             
                 self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack           
                 self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto               
                 peca.estado = 2 
-        elif self.last == 1:
+        elif self.atual == 1:
                 self.end_time = time.time()
                 self.elapsedTimeRed = self.end_time - self.elapsedTimeRed                       
                 self.tempoVermelho = self.elapsedTimeRed + self.tempoVermelho                   
@@ -157,13 +159,49 @@ class Tabuleiro:
         tempoTela = self.font.render(str(cronometro), 1, (0,0,0))
         screen.blit(tempoTela, (260, 30))
 
+        #verifica se a ia tem alguma jogada a fazer
+        if not self.iaplayed:
+            if self.ai and self.human and not self.fim:
+                self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                self.pontuacao()
+                self.alternador()
+                self.fim = self.fimJogo(self.tabuleiro, 0, self.atual)
+                while self.isPassaVez(self.tabuleiro, self.atual) and not self.fim:
+                    self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.last, self.heuristicas[0], float("-inf"), float("inf"))[1]
+                    self.pontuacao()
+                    self.fim = self.fimJogo(self.tabuleiro, 0, self.last)
+                self.jogada = [0]
+                self.iaplayed = 1
+
+        #verifica se existem jogadas a serem feitas
+        if self.jogada[0] and self.iaplayed:
+            mapX = self.jogada[1][0]
+            mapY = self.jogada[1][1]
+            peca = self.tabuleiro[mapX][mapY]
+    
+            if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
+                peca.estado = self.alternador() 
+                self.fim = self.fimJogo(self.tabuleiro, 1, self.atual) 
+                self.pontuacao()
+            
+                if not self.ai:
+                    self.jogada = [0]
+                else:
+                    self.iaplayed = 0
+            else:
+                self.jogada = [0]
+            
+
+        #pinta o tabuleiro
         for i in range(8):
             for j in range(8):
                 item = self.tabuleiro[i][j]
                 if item.estado != 0:
                     newsurface = item.img()
                     screen.blit(newsurface, (i*41 + 5 + self.offset[0], j*41 + 5 + self.offset[1]))
+                    
 
+            
         self.tempo = self.tempo + self.tempoAdicionar
         
     def isPassaVez(self, tabuleiroFimJogo, jogadorAtual):
@@ -249,31 +287,19 @@ class Tabuleiro:
         #self.pontuacao()
         
     
+    
     def click(self, x, y):
-        if x < self.offset[0] or x > self.size[0] + self.offset[0]:
-            return
-        if y < self.offset[1] or y > self.size[1] + self.offset[1]:
-            return
-
-        mapX = self.map(x,0)
-        mapY = self.map(y,1)
+        if not self.jogada[0]:
+            if x < self.offset[0] or x > self.size[0] + self.offset[0]:
+                return
+            if y < self.offset[1] or y > self.size[1] + self.offset[1]:
+                return
+    
+            mapX = self.map(x,0)
+            mapY = self.map(y,1)
         
-        peca = self.tabuleiro[mapX][mapY]
-
-        if (not peca.estado) and self.jogadaValida(mapX, mapY, self.tabuleiro, 0, self.atual):
-            peca.estado = self.alternador() 
-            self.fim = self.fimJogo(self.tabuleiro, 1, self.atual) 
-            self.pontuacao()
-            
-            if self.ai and self.human and not self.fim and not peca.estado == self.atual:
-                self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.atual, self.heuristicas[0], float("-inf"), float("inf"))[1]
-                self.pontuacao()
-                self.alternador()
-                self.fim = self.fimJogo(self.tabuleiro, 0, self.atual)
-                while self.isPassaVez(self.tabuleiro, self.atual) and not self.fim:
-                    self.tabuleiro = self.minimax(self.tabuleiro, 4, 1, 1, self.last, self.heuristicas[0], float("-inf"), float("inf"))[1]
-                    self.pontuacao()
-                    self.fim = self.fimJogo(self.tabuleiro, 0, self.last)
+            self.jogada = [1, (mapX, mapY)]
+        
 
                 #while True:
                 #    print 'iterou'
