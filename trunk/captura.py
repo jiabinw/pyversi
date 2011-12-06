@@ -3,46 +3,63 @@ import os, sys, copy
 from peca import *
 from tabuleiro import *
 
-class Captura:
-  
+class Captura: # Verifica quantas pecas posso perder naquela jogada menos quanto meu adversario pode perder
     novoTab = []
       
-    def calcula(self, tabuleiro, jogadorProx):         
+    def calcula(self, tabuleiro, jogadorAtual):
+        if jogadorAtual == 1:
+            jogadorProx = 2
+        else:
+            jogadorProx = 1
+        
         if len(self.novoTab) == 0: #inicializa
-            row = [0] * 8        
-            for item in row:
-                self.novoTab.append(copy.deepcopy(row))
+            self.novoTab = [[0] * 8 for i in range(8)]
         else:  #somente atualiza
             for i in range(8):
                 for j in range(8):            
                     self.novoTab[i][j] = 0
 
-        contador = 0
-        contadorAtual = 0
-     
+        contador = contadorAtual = 0
         for i in range(8):
             for j in range(8):
                 if tabuleiro[i][j].estado == 0:
                     self.jogadaValida(i, j, tabuleiro, 0, jogadorProx)
+        for i in range(8):
+            for j in range(8):
+                contador +=  self.novoTab[i][j]
+                
+        for i in range(8):
+            for j in range(8):
+                if tabuleiro[i][j].estado == jogadorAtual:
+                    contadorAtual += 1
+        captura = contadorAtual - contador
+         
+        if len(self.novoTab) == 0: #inicializa
+            self.novoTab = [[0] * 8 for i in range(8)]
+        else:  #somente atualiza
+            for i in range(8):
+                for j in range(8):            
+                    self.novoTab[i][j] = 0
+
+        contador = contadorAtual = 0
+        for i in range(8):
+            for j in range(8):
+                if tabuleiro[i][j].estado == 0:
+                    self.jogadaValida(i, j, tabuleiro, 0, jogadorAtual)
 
         for i in range(8):
             for j in range(8):
                 contador = contador + self.novoTab[i][j]
                 
-        if jogadorProx == 1:
-            jogadorAtual = 2
-        else:
-            jogadorAtual = 1
-     
         for i in range(8):
             for j in range(8):
-                if tabuleiro[i][j].estado == jogadorAtual:
+                if tabuleiro[i][j].estado == jogadorProx:
                     contadorAtual += 1
      
-        captura = contadorAtual - contador
+        capturaMeu = contadorAtual - contador
         
         if contadorAtual > 0:
-            captura = captura / float(64) * 100
+            capturaMeu = (captura - capturaMeu) / float(64) * 100
         
         return captura
 

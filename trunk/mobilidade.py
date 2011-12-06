@@ -2,6 +2,7 @@
 import os, sys, copy
 from peca import *
 from tabuleiro import *
+from pesoPosicao import *
 
 class Mobilidade: # Calcula quanto de Mobilidade o meu adversario tem. Quanto mais movimentos ele tem pior para mim (ou seja, maior valor retornado), o raciocinio analogo vale para o contrario disso.
   
@@ -12,13 +13,34 @@ class Mobilidade: # Calcula quanto de Mobilidade o meu adversario tem. Quanto ma
         else:
             jogador = 1
         
+        pesoPosicao = (
+                        (1200, -40, 20, 10, 10, 20, -40,1200),
+                        (-40,-120, 10,-10,-10, 10,-120,-40),
+                        ( 20,  10, 15,  3,  3, 15,  10, 20),
+                        ( 10, -10,  3,  3,  3,  3, -10, 10),
+                        ( 10, -10,  3,  3,  3,  3, -10, 10),
+                        ( 20,  10, 15,  3,  3, 15,  10, 20),
+                        (-40,-120, 10,-10,-10, 10,-120,-40),
+                        (1200, -40, 20, 10, 10, 20, -40,1200)
+                      )
+        
         avaliacao = 0
         for i in range(8):
             for j in range(8):
                 if tabuleiro[i][j].estado == 0:
-                    avaliacao += self.jogadaValida(i, j, tabuleiro, jogador, 1)
+                    #novoTab = copy.deepcopy(tabuleiro)
+                    if self.jogadaValida(i, j, tabuleiro, jogador, 0):
+                        avaliacao += pesoPosicao[i][j]
         
-        normalizado = ((28 - avaliacao) / float(64)) * 100
+        minhaAvaliacao = 0            
+        for i in range(8):
+            for j in range(8):
+                if tabuleiro[i][j].estado == 0:
+                    #novoTab = copy.deepcopy(tabuleiro)
+                    if self.jogadaValida(i, j, tabuleiro, jogadorAtual, 0):
+                        avaliacao += pesoPosicao[i][j]
+        
+        normalizado = ((minhaAvaliacao - avaliacao) / float(64)) * 100
         
         return normalizado
         
@@ -167,16 +189,17 @@ class Mobilidade: # Calcula quanto de Mobilidade o meu adversario tem. Quanto ma
 
 
         # Se a jogada for valida, da o flip nas pecas para a cor do jogador corrente
-        if ((jogadaValida == 1) and (not(verifica))):
-            if self.last == 1:
-                cor = 2
-            else:
-                cor = 1
-            for t in todosVirar:
-                for t0 in t:
-                    t0.estado = cor
-        elif((jogadaValida != 1) and (not(verifica))):
-            print "Erro: Jogada Invalida"           
+        #if ((jogadaValida == 1) and (not(verifica))):
+            #if self.last == 1:
+             #   cor = 2
+            #else:
+            #    cor = 1
+            #for t in todosVirar:
+                #for t0 in t:
+                    #t0.estado = cor
+            #novoTab[i][j].estado = cor
+        #elif((jogadaValida != 1) and (not(verifica))):
+            #print "Erro: Jogada Invalida"           
                 
         return jogadaValida
 

@@ -17,7 +17,7 @@ class NivelFacil:
         pesoPosicao = pesoMobilidade = 0
         
         pesoCaptura = 1
-        pesoNrPecas = 3
+        pesoNrPecas = 1
         
         if(pesoPosicao > 0):
             valorPosicao = PesoPosicao().calcula(tabuleiro, jogadorAtual)

@@ -9,7 +9,7 @@ class Peca:
     
     def __init__(self):
         self.estado = 0
-        
+  
     def img(self):
         if (self.estado != 0):
             return self.imgSurface[self.estado-1]
