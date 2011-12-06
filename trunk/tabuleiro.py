@@ -100,8 +100,8 @@ class Tabuleiro:
         return tabCopied
 
     def refresh(self):	
-        colorFlag = self.last
-        
+        colorFlag = self.atual
+        #print "color1", self.atual
         if self.atual == 1:
           self.elapsedTimeRed = time.time()               
         else:
@@ -113,10 +113,11 @@ class Tabuleiro:
             self.fim = self.fimJogo(self.tabuleiro, 1, self.atual)
             self.pontuacao()
         
+        
         if self.atual != colorFlag:       
-          if self.atual == 1:
+          if self.atual == 2:	   
             self.elapsedTimeBlack = time.time()
-          else:
+          else:	 
             self.elapsedTimeRed = time.time()
             
         screen = self.pygame.display.get_surface()        
@@ -127,8 +128,8 @@ class Tabuleiro:
         proximo = self.font.render(" Proximo ", 1, (0, 0, 0))
         screen.blit(proximo,(25, 30))
         if self.atual == 2:
-                self.end_time = time.time()             
-                self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack
+                self.end_time = time.time()                           
+                self.elapsedTimeBlack = self.end_time - self.elapsedTimeBlack               
                 self.tempoPreto = self.elapsedTimeBlack + self.tempoPreto               
                 peca.estado = 2 
         elif self.atual == 1:
@@ -253,8 +254,8 @@ class Tabuleiro:
                 return 0
             
             #Se chegou aqui significa que o jogador atual nao tem mais jogadas validas                        
-            if alterna:
-                print " Passou a vez ", jogadorAtual
+          #  if alterna:
+                #print " Passou a vez ", jogadorAtual
             if jogadorAtual == 1:
                 player = 2
             else:
@@ -270,16 +271,15 @@ class Tabuleiro:
         
     def fimJogo(self, tabuleiroFimJogo, alterna,  jogadorAtual):        
         if (self.isFimJogo(tabuleiroFimJogo, alterna, jogadorAtual)):
-            print " Fim do Jogo "            
+           # print " Fim do Jogo "            
             self.pontuacao()
-            if self.pontosVermelho > self.pontosPreto:
-                print " Vermelho ganhou "
-            elif self.pontosVermelho < self.pontosPreto:
-                print " Preto ganhou "
-            else:
-                print " Empate "
-            print "Red Time", self.tempoVermelho
-            print "Black Time", self.tempoPreto
+           # if self.pontosVermelho > self.pontosPreto:
+               # print " Vermelho ganhou "
+           # elif self.pontosVermelho < self.pontosPreto:
+               # print " Preto ganhou "
+          #  else:
+               # print " Empate "
+            print self.heuristicas,";", "Red Time;", self.tempoVermelho,";PontosV;",self.pontosVermelho,";PontosP;",self.pontosPreto,";Black Time;", self.tempoPreto
             return 1
         return 0
         
