@@ -1,0 +1,1 @@
+This will be a python implementation of Reversi, including AI. This will be coded for learning reasons.
